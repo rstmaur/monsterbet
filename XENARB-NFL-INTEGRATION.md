@@ -6,20 +6,33 @@ Live mode is disabled. The current XenArb process consumes Monster.bet arbitrage
 
 ## Recommended provider
 
-SportsDataIO commercial NFL feeds are the cleanest single-provider fit because their official NFL workflow covers schedules and status, injuries, pre-game and in-play game lines, line movement, consensus lines, and player/game/team props. Their Discovery Lab Odds plan is $99/month or $599/year, but it is next-day delayed and not licensed for commercial redistribution, so it cannot satisfy this production use case. Real-time commercial pricing and redistribution rights require a written SportsDataIO sales quote; no public fixed price exists.
+Decision memo with costs, activation times, fields and redistribution rights:
+**`NFL-ODDS-PROVIDER-DECISION.md`**. Summary of the recommendation:
 
-Rémi must obtain:
+**The Odds API (the-odds-api.com), 5M-credit plan, $119/month.** Self-serve, key issued
+immediately, covers DraftKings / FanDuel / BetMGM on `americanfootball_nfl` for `h2h`,
+`spreads` and `totals`, expressly permits commercial display of the data in a website, and
+expressly permits retaining it indefinitely (which is what makes our line-movement history
+legal). Attribution is not required.
 
-- SportsDataIO commercial NFL Odds access;
-- NFL scores/schedules and game-status access;
-- NFL injuries/depth-chart access if licensed for display;
-- NFL Props access if player props are enabled;
-- commercial web-display/redistribution rights for Monsterbet.ai;
-- production API key supplied as `SPORTSDATAIO_API_KEY` only on XenHive;
-- confirmed request limits, permitted cache duration, required attribution and SLA;
-- written price quote and contract term.
+SportsDataIO remains the better long-term fit — official NFL workflow, consensus lines,
+injuries and props under one written licence — but its real-time commercial feed is
+quote-only with a contract, which cannot be activated before NFL Week 1. Its published
+Discovery Lab Odds plan ($99/month, $599/year) is next-day delayed and not licensed for
+commercial redistribution, so it cannot power this board. Open that conversation for 2027.
 
-Authentication uses the server-side header `Ocp-Apim-Subscription-Key: <key>`. The key must never reach GitHub Pages or browser JavaScript.
+Rémi must approve, before any ingestion work starts:
+
+- the $119/month subscription and the card it bills to;
+- an email to The Odds API confirming that serving our own first-party `/v1/nfl/board`
+  endpoint (CORS-locked to `https://monsterbet.ai`, undocumented, no third-party keys) is
+  in scope and not "offering data through your own API" — see the decision memo;
+- whether player props are in launch scope, since they use a different endpoint and change
+  the credit maths.
+
+The production API key is supplied as `THE_ODDS_API_KEY` on XenHive only. Authentication is
+the `apiKey` query parameter, added server-side. The key must never reach GitHub Pages or
+browser JavaScript.
 
 ## XenArb ingestion
 
@@ -35,7 +48,24 @@ Authentication uses the server-side header `Ocp-Apim-Subscription-Key: <key>`. T
 
 ## Required source fields
 
-SportsDataIO mappings must include `ScoreID`/`BettingEventID`, `GameStartTime`, `GameStatus`, home/away IDs and names, `BettingMarketID`, market/bet/period types, `BettingOutcomeID`, `SportsBook`, `BettingOutcomeType`, `Value`, `PayoutAmerican`, `PayoutDecimal`, `IsAvailable`, `IsInPlay`, `SportsbookMarketID`, `SportsbookOutcomeID`, `Created`, `Updated`, player/team IDs when applicable, consensus outcomes and injury/practice status timestamps.
+From The Odds API `/v4/sports/americanfootball_nfl/odds`: `id`, `commence_time`,
+`home_team`, `away_team`; per bookmaker `key`, `title`, `last_update`; per market `key`,
+`last_update`; per outcome `name`, `price`, `point`.
+
+These map onto `xenarb-nfl-api-contract.json` as: `id` → `eventId`, `commence_time` →
+`kickoff`, bookmaker `title` → `sportsbook`, market `key` → `marketId`, outcome `name` →
+`selection`, `point` → `value`, `price` → `price`. The provider supplies one `last_update`
+per bookmaker/market rather than per outcome; carry that value into `providerTimestamp` for
+every outcome in that market, and stamp `xenarbIngestedAt` at write time.
+
+Opening lines are not in the live response. Backfill true openers once per event from
+`/v4/historical/sports/americanfootball_nfl/odds` (5-minute snapshots, `10 × markets ×
+regions` credits per call), then track movement from XenArb's own stored history. If the
+historical backfill is skipped, the board column must read `First seen`, not `Open`.
+
+Game status is not supplied by the odds endpoint. Source `status` from the provider's
+scores endpoint, or hold every event at `upcoming` until a status feed is wired in — never
+infer it from kickoff time alone.
 
 ## Production evidence gate
 

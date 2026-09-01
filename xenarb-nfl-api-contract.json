@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://monsterbet.ai/contracts/xenarb-nfl-board-v1.json",
+  "title": "XenArb NFL board snapshot",
+  "type": "object",
+  "required": ["schemaVersion", "provider", "xenarb", "events"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "weekLabel": { "type": "string" },
+    "provider": {
+      "type": "object",
+      "required": ["name", "timestamp"],
+      "properties": {
+        "name": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "xenarb": {
+      "type": "object",
+      "required": ["snapshotId", "ingestedAt"],
+      "properties": {
+        "snapshotId": { "type": "string" },
+        "ingestedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["eventId", "kickoff", "status", "teams", "markets", "intelligence"],
+        "properties": {
+          "eventId": { "type": "string" },
+          "kickoff": { "type": "string", "format": "date-time" },
+          "status": { "enum": ["upcoming", "live", "final", "postponed", "cancelled"] },
+          "teams": {
+            "type": "object",
+            "required": ["away", "home"],
+            "properties": { "away": { "type": "string" }, "home": { "type": "string" } }
+          },
+          "hasPlayerProps": { "type": "boolean" },
+          "markets": {
+            "type": "object",
+            "properties": {
+              "spread": { "$ref": "#/$defs/market" },
+              "moneyline": { "$ref": "#/$defs/market" },
+              "total": { "$ref": "#/$defs/market" }
+            }
+          },
+          "intelligence": {
+            "type": "object",
+            "required": ["consensusLine", "movementSummary", "sportsbookDisagreement", "unusualMovement", "lastChangedAt"],
+            "properties": {
+              "consensusLine": {},
+              "movementSummary": { "type": "string" },
+              "sportsbookDisagreement": { "type": "string" },
+              "unusualMovement": { "type": "boolean" },
+              "lastChangedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "quote": {
+      "type": "object",
+      "required": ["provider", "sportsbook", "eventId", "marketId", "selection", "value", "price", "impliedProbability", "providerTimestamp", "xenarbIngestedAt"],
+      "properties": {
+        "provider": { "type": "string" },
+        "sportsbook": { "type": "string" },
+        "eventId": { "type": "string" },
+        "marketId": { "type": "string" },
+        "selection": { "type": "string" },
+        "value": {},
+        "price": {},
+        "impliedProbability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "providerTimestamp": { "type": "string", "format": "date-time" },
+        "xenarbIngestedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "market": {
+      "type": "object",
+      "required": ["marketId", "opening", "current", "direction", "movementSize", "lastChangedAt", "books"],
+      "properties": {
+        "marketId": { "type": "string" },
+        "opening": {},
+        "current": {},
+        "direction": { "enum": ["up", "down", "unchanged"] },
+        "movementSize": { "type": "number" },
+        "lastChangedAt": { "type": "string", "format": "date-time" },
+        "best": { "$ref": "#/$defs/quote" },
+        "books": { "type": "array", "items": { "$ref": "#/$defs/quote" } }
+      }
+    }
+  }
+}

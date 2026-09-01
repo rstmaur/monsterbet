@@ -316,6 +316,8 @@ header{
 .plan.feat .btn-plan{background:var(--grad-cta);color:#04120A;border-color:transparent;box-shadow:0 10px 30px rgba(57,255,106,.22)}
 .plan .save{position:absolute;top:-11px;left:24px;font:700 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#04120A;background:linear-gradient(100deg,#C4A0FF,#A855F7);padding:6px 10px;border-radius:6px}
 .pricing-note{margin-top:26px;color:var(--faint);font-size:13.5px;text-align:center}
+.fee-note{max-width:660px;margin:0 auto 24px;text-align:center;font:600 13.5px/1.6 var(--sans);color:var(--text);background:rgba(168,85,247,.10);border:1px solid var(--line-2);border-radius:12px;padding:11px 18px}
+.fee-inline{font:600 13px/1.55 var(--sans);color:var(--text);margin:0 0 16px}
 /* ---------- insights ---------- */
 .posts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .post{
@@ -441,6 +443,7 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
         <p class="lede">
           MonsterGPT is an AI research co-pilot built for football. Ask about a matchup, an injury report, a player prop, a situational trend or how a line has moved &mdash; and get your research organised into a clean, readable brief in seconds instead of an evening of open tabs.
         </p>
+        <p class="fee-inline">Whop applies a 5% service fee at checkout.</p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-funnel="weekly-subscription" data-product="monstergpt_weekly" data-affiliate="xentraffic">Get Weekly Access &mdash; $27 <span class="arrow">&rarr;</span></a>
           <a class="btn btn-ghost" href="#research">See what it researches</a>
@@ -827,6 +830,8 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
       <p class="lede" style="margin:0 auto">Same MonsterGPT on every plan. Start with a single game week, or lock in the full run.</p>
     </div>
 
+    <p class="fee-note">Whop applies a 5% service fee at checkout.</p>
+
     <div class="plans">
       <div class="plan feat reveal">
         <span class="tag">Best for week one</span>
@@ -869,7 +874,7 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
         <a class="btn-plan" href="https://whop.com/checkout/plan_H6s6AeCBGTVY1/?a=xentraffic" target="_blank" rel="noopener" data-funnel="yearly-subscription" data-product="monstergpt_yearly" data-affiliate="xentraffic">Get Yearly Access <span class="arrow">&rarr;</span></a>
       </div>
     </div>
-    <p class="pricing-note">Prices in USD. MonsterGPT is a research and organisation tool &mdash; it does not provide picks, guarantees or financial advice.</p>
+    <p class="pricing-note">Prices in USD. Whop applies a 5% service fee at checkout. MonsterGPT is a research and organisation tool &mdash; it does not provide picks, guarantees or financial advice.</p>
   </div>
 </section>
 
@@ -983,6 +988,7 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
       <span class="eyebrow"><i></i>Kickoff</span>
       <h2>Start with <span class="grn">one game week</span></h2>
       <p class="lede">Put MonsterGPT next to your research for a single week and see how much of your Sunday morning you get back.</p>
+      <p class="fee-inline">Whop applies a 5% service fee at checkout.</p>
       <a class="btn btn-primary" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-funnel="weekly-subscription" data-product="monstergpt_weekly" data-affiliate="xentraffic">Get Weekly Access &mdash; $27 <span class="arrow">&rarr;</span></a>
       <p class="cta-note">Research tool only &middot; no picks or guarantees &middot; 18+ &middot; play responsibly</p>
     </div>
@@ -1033,7 +1039,9 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
   document.querySelectorAll('a[data-product^="monstergpt_"]').forEach(function(link){
     var destination = new URL(link.href);
     campaignKeys.forEach(function(key){
-      if(query.has(key)) destination.searchParams.set(key, query.get(key));
+      if(query.has(key) && query.get(key)){
+        destination.searchParams.set(key, query.get(key));
+      }
     });
     link.href = destination.toString();
   });

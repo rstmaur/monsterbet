@@ -2,49 +2,96 @@
 
 ## Current state
 
-Live mode is disabled. The current XenArb process consumes Monster.bet arbitrage events and does not expose the traceable schedule, game-state, per-sportsbook market history, injury or public HTTP/SSE interfaces required by Monsterbet.ai. That dataset must not power the NFL odds board.
+Live mode is disabled. `xenarb-config.js` is `enabled: false` and the board renders its
+empty state.
 
-## Recommended provider
+The ingestion subsystem is **built and tested**, waiting only on an approved API key. It
+lives at `/home/xenhive/xenarb/src/nfl/` and is deliberately independent of the existing
+Monster.bet arbitrage pipeline — it shares the logger only, and writes to its own
+`data/nfl/` store. It makes **zero outbound requests** unless `NFL_ENABLED=true` *and*
+`THE_ODDS_API_KEY` is set; with either missing it logs exactly what is absent and exits 0.
 
-Decision memo with costs, activation times, fields and redistribution rights:
-**`NFL-ODDS-PROVIDER-DECISION.md`**. Summary of the recommendation:
+| File | Role |
+|---|---|
+| `src/nfl/config.js` | Feature flag, provider settings, poll cadence, origin lock |
+| `src/nfl/provider.js` | The Odds API client; quota headers, 429 `Retry-After`, key redaction |
+| `src/nfl/normalize.js` | Provider payload → contract quote objects |
+| `src/nfl/history.js` | Append-only `quotes.jsonl` + first-seen store |
+| `src/nfl/board.js` | Movement, best line, disagreement → contract snapshot |
+| `src/nfl/server.js` | `GET /v1/nfl/board`, `GET /v1/nfl/health`, origin-locked |
+| `src/nfl/index.js` | Entry point + poller |
+| `scripts/nfl-selftest.js` | 30 offline assertions; needs no key, makes no network call |
 
-**The Odds API (the-odds-api.com), 5M-credit plan, $119/month.** Self-serve, key issued
-immediately, covers DraftKings / FanDuel / BetMGM on `americanfootball_nfl` for `h2h`,
-`spreads` and `totals`, expressly permits commercial display of the data in a website, and
-expressly permits retaining it indefinitely (which is what makes our line-movement history
-legal). Attribution is not required.
+Run `npm run nfl:selftest` to re-verify the pipeline without a subscription.
 
-SportsDataIO remains the better long-term fit — official NFL workflow, consensus lines,
-injuries and props under one written licence — but its real-time commercial feed is
-quote-only with a contract, which cannot be activated before NFL Week 1. Its published
-Discovery Lab Odds plan ($99/month, $599/year) is next-day delayed and not licensed for
-commercial redistribution, so it cannot power this board. Open that conversation for 2027.
+## Provider
 
-Rémi must approve, before any ingestion work starts:
+**The Odds API, 5M plan, $119/month.** Costs, exact contractual language, bookmaker and
+market evidence, the weekly quota calculation and the outstanding licence question are all
+in **`NFL-ODDS-PROVIDER-DECISION.md`**. Summary:
 
-- the $119/month subscription and the card it bills to;
-- an email to The Odds API confirming that serving our own first-party `/v1/nfl/board`
-  endpoint (CORS-locked to `https://monsterbet.ai`, undocumented, no third-party keys) is
-  in scope and not "offering data through your own API" — see the decision memo;
-- whether player props are in launch scope, since they use a different endpoint and change
-  the credit maths.
+- Terms (last updated 31 August 2026) expressly permit displaying the data in a commercial
+  website, retaining it indefinitely, and displaying values derived from it.
+- They expressly prohibit reselling it as a standalone data product "through your own API,
+  data feed, downloadable files, or any other format intended to serve as a source of raw
+  data for others".
+- **Open question, blocking purchase:** whether our first-party `GET /v1/nfl/board`
+  endpoint falls on the permitted side of that line. Email sent 2026-09-01 to
+  `team@the-odds-api.com`; awaiting written reply. Do not subscribe until it arrives.
 
-The production API key is supplied as `THE_ODDS_API_KEY` on XenHive only. Authentication is
-the `apiKey` query parameter, added server-side. The key must never reach GitHub Pages or
-browser JavaScript.
+The production key is `THE_ODDS_API_KEY` in `/home/xenhive/xenarb/.env` on XenHive only.
+Auth is the `apiKey` query parameter, added server-side. It must never reach GitHub Pages
+or browser JavaScript; `provider.js` redacts it from every log line.
+
+## Board conventions
+
+Fixed here so the rendered numbers are auditable:
+
+- The board renders one side per market: **spreads** → the home team's handicap,
+  **h2h** → the home team's moneyline, **totals** → the Over.
+- Market-level `current` is the modal line across the three books (median American price
+  for moneyline). `opening` is the same statistic at first observation.
+- **Best line** — spreads: the largest handicap for the home side, ties broken on price;
+  totals: the lowest Over number, ties broken on price; moneyline: the highest American
+  price.
+- `unusualMovement` is set when the spread has moved two points or more from first seen.
+- Game status is **not** supplied by the odds endpoint. Events read `upcoming` before
+  kickoff and `live` after it; the board never claims `final` until a scores feed is wired in.
+
+## Opening lines
+
+`openingSource` is carried at snapshot and market level and takes one of two values:
+
+- `first_seen` — XenArb's own earliest observation. **This is the default and the current
+  state.** The page labels its column **"First seen"**.
+- `provider_historical` — a genuine book opener from the provider's historical endpoint,
+  applied through `history.applyHistoricalOpeners()`, which refuses any other source value.
+  Only then does the page relabel the column "Opening".
+
+Historical access costs `10 × markets × regions` = 30 credits per lookup, with 5-minute
+snapshots back to 2020. It is **out of launch scope**: the column stays "First seen" until
+a backfill has been run *and* verified.
 
 ## XenArb ingestion
 
-1. Add a separate `nfl-provider` module to `/home/xenhive/xenarb`; do not reuse prediction-market or arbitrage records.
-2. Poll provider endpoints at the licensed interval and honor cache headers, quota headers and `429 Retry-After`.
-3. Normalize schedule/status, teams, kickoff, sportsbook, event ID, market ID, selection, line/value, American price, provider update time and XenArb ingestion time.
-4. Persist every changed outcome as an immutable historical snapshot in PostgreSQL (recommended), keyed by provider, event, market, sportsbook, selection and provider timestamp.
-5. Calculate opening/current movement, size/direction, best available price, implied probability, consensus, sportsbook disagreement, unusual movement and last-change time inside XenArb.
-6. Expose read-only `GET /v1/nfl/board` and optional `GET /v1/nfl/stream` SSE endpoints matching `xenarb-nfl-api-contract.json`.
+1. Separate `nfl-provider` subsystem under `/home/xenhive/xenarb/src/nfl/`; no reuse of
+   prediction-market or arbitrage records. **Done.**
+2. Poll at the licensed interval, honour quota headers and `429 Retry-After`. **Done** —
+   60s, tightening to 30s while a game is live or within 60 minutes of kickoff.
+3. Normalize schedule, teams, kickoff, sportsbook, event ID, market ID, selection, line,
+   American price, provider update time and XenArb ingestion time. **Done.**
+4. Persist every changed outcome as an immutable snapshot. **Done** — `data/nfl/quotes.jsonl`,
+   append-only, unchanged quotes are not re-appended.
+5. Calculate movement, size, direction, best price, implied probability, consensus,
+   disagreement and last-change time inside XenArb. **Done.**
+6. Expose read-only `GET /v1/nfl/board`. **Done.** SSE remains optional and unbuilt.
 7. Allow CORS only from `https://monsterbet.ai`; expose no credentials or upstream URLs.
+   **Done** — a foreign `Origin` gets 403, `Allow-Origin` is never a wildcard or reflected,
+   and the server binds to `127.0.0.1` by default.
 8. Put the public API behind HTTPS, rate limiting, health checks and structured logs.
-9. Set `enabled`, `apiBase`, transport and provider-compliant intervals in `xenarb-config.js` only after Hawk completes the gate below.
+   **Partly** — `/v1/nfl/health` and structured logs are in; TLS termination and rate
+   limiting are reverse-proxy work, still to do at activation.
+9. Set `enabled`, `apiBase` and intervals in `xenarb-config.js` only after the gate below.
 
 ## Required source fields
 

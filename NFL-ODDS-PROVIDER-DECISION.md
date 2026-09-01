@@ -1,102 +1,205 @@
-# NFL odds provider — decision required from Rémi
+# NFL odds provider — definitive purchase decision
 
-Prepared 2026-09-01. Read-only research; nothing purchased, no account created, no key requested.
+Rev 2, 2026-09-01. Supersedes Rev 1 and the earlier SportsGameOdds recommendation.
+Nothing has been purchased. No account has been created.
 
-The board in this PR stays empty until one of these providers is contracted. NFL Week 1
-opens 2026-09-10, so "this week" means a provider that can be live inside ~7 days.
+## The contradiction, and why it happened
 
-## Recommendation: The Odds API — $119/month, live in under an hour
+Two earlier reports disagreed:
+
+- The first recommended **SportsGameOdds Rookie, $99/month**, on the grounds that
+  The Odds API's terms were *silent* on public display and SportsGameOdds' were explicit.
+- The second recommended **The Odds API, $119/month**, on the grounds that its terms
+  *expressly permit* commercial display.
+
+Both reads were of the same page. The first was not wrong when it was made.
+**The Odds API's Terms and Conditions carry `Last updated: 31 August 2026`** — they were
+revised the day before the second read. The current version adds an explicit permitted-uses
+list that did not previously exist.
+
+The $40/month that the SportsGameOdds recommendation was buying — an express written
+display right — is now available from The Odds API at a lower price for the quota we
+actually need. That is what changed, and it is the whole basis for switching.
+
+Everything below is quoted from the live pages, fetched raw rather than summarised.
+
+---
+
+## Decision: The Odds API — 5M plan, $119/month
 
 | | |
 |---|---|
-| Provider | The Odds API (the-odds-api.com) |
-| Plan | 5M credits/month — **$119/month** |
-| Activation | Self-serve. Email → API key issued immediately. No sales call, no contract. |
-| NFL coverage | `americanfootball_nfl`, region `us` — DraftKings, FanDuel, BetMGM all present |
-| Markets | `h2h` (moneyline), `spreads`, `totals`. Player props via the per-event endpoint. |
-| Redistribution | Display in a commercial website/app **expressly permitted**. Resale of the data as a standalone data product **prohibited**. |
-| Storage | Retaining the data indefinitely is expressly permitted — this is what makes our line-movement history legal. |
-| Attribution | Not required. |
+| Provider | The Odds API (The Odds API Pty Ltd, ACN 627461947, New South Wales, Australia) |
+| Plan name | **5M** |
+| Live checkout price | **$119 per month, USD** |
+| Quota | **5,000,000 credits per month** |
+| Purchase URL | <https://the-odds-api.com/#get-access> → START, which resolves to <https://dash.the-odds-api.com/> |
+| Screenshot | `evidence/provider-plans.png` — all five live tiers |
+| Activation | Self-serve. "Subscribe to receive your API key via email." No sales call, no contract, no minimum term. |
 
-### Why this one
+Full live pricing table, captured 2026-09-01:
 
-It is the only provider found that is simultaneously (a) self-serve with an instant key,
-(b) priced in the low hundreds rather than the low thousands, and (c) explicit in writing
-that commercial display in a website is an allowed use. Every other candidate fails at
-least one of those three, and the two that fail on activation time cannot be live for Week 1.
-
-### Cost sizing
-
-Current-odds cost formula: `credits = markets × regions`. Our board is 3 markets × 1 region
-(`us`) = **3 credits per refresh**.
-
-| Refresh | Requests/month | Credits/month | Cheapest plan that fits |
+| Plan | Price | Credits / month | Historical Odds |
 |---|---|---|---|
-| 30s, 24/7 | 86,400 | 259,200 | 5M — **$119** |
-| 60s, 24/7 | 43,200 | 129,600 | 5M — $119 |
-| 60s, game windows only | ~12,000 | ~36,000 | 100K — $59 |
+| Starter | FREE | 500 | ✗ (struck through) |
+| 20K | $30 /mo USD | 20,000 | ✓ |
+| 100K | $59 /mo USD | 100,000 | ✓ |
+| **5M** | **$119 /mo USD** | **5,000,000** | ✓ |
+| 15M | $249 /mo USD | 15,000,000 | ✓ |
 
-The $59/100K plan technically fits a windowed poller, but it leaves no headroom for
-retries, backfill or a second sport. **Take the $119 plan**; at 30s polling it runs at ~5%
-of quota.
+All paid tiers advertise "All sports", "All bookmakers", "All betting markets".
 
-### Opening lines
+---
 
-The live endpoint returns current prices only. Two routes to the "Open" column:
+## Evidence
 
-1. **True book openers** — the historical endpoint (`/v4/historical/...`, snapshots every
-   5 minutes back to 2020) costs `10 × markets × regions` = 30 credits per lookup. One
-   lookup per event per week for ~16 games is ~500 credits. Negligible.
-2. **First-sighting opener** — XenArb records its own first observation of each event and
-   labels the column accordingly.
+### 1. Exact contractual language permitting commercial display
 
-Use (1) to backfill Week 1, then (2) going forward. If we ship (2) only, the column must be
-labelled "First seen", not "Open".
+From <https://the-odds-api.com/terms-and-conditions.html>, section **Restrictions**,
+verbatim:
 
-### Fields we consume
+> Do not resell, repackage, or redistribute our data as a standalone data product. This
+> includes, but is not limited to, offering our data through your own API, data feed,
+> downloadable files, or any other format intended to serve as a source of raw data for
+> others.
+>
+> We support and encourage the use of our data in websites, mobile apps, dashboards,
+> analytical tools, and other user-facing applications, including commercial use, provided
+> our data is not the primary product being sold or redistributed.
+>
+> Permitted uses include, but are not limited to:
+>
+> - Storing our data and retaining it indefinitely
+> - **Displaying our data in a UI, website, or mobile app, including for commercial use**
+> - Using our data in research papers and analytical dashboards
+> - Calculating and displaying values you derive from our data
+> - Using our data to train statistical and machine learning models
+>
+> We mainly prohibit reselling the data as a raw data feed, i.e. a competing product. In
+> other words, don't resell our data as your own API or data source.
+>
+> Attribution to The Odds API is not required, but is always appreciated.
 
-`id`, `commence_time`, `home_team`, `away_team`, then per bookmaker `key`, `title`,
-`last_update`, and per market `key`, `last_update`, `outcomes[].name`, `outcomes[].price`,
-`outcomes[].point`. That maps 1:1 onto the `quote` object in `xenarb-nfl-api-contract.json`
-except that the provider gives one `last_update` per bookmaker/market rather than per
-outcome — XenArb should carry that value into `providerTimestamp` for every outcome in
-that market.
+Three clauses matter to us and all three are favourable: commercial display is named
+explicitly; indefinite storage is named explicitly, which is what makes our line-movement
+history lawful; and derived values — our movement, best-line and disagreement columns — are
+named explicitly.
 
-### ⚠️ One licence question Rémi must settle in writing before launch
+One further clause we already satisfy, from **Responsible Gambling**:
 
-The XenArb design in `XENARB-NFL-INTEGRATION.md` publishes `GET /v1/nfl/board` as an
-HTTPS JSON endpoint. Read literally, "offering data through your own API or data feed"
-is the prohibited behaviour, even though our intent is only to feed our own page.
+> If the Service is used to promote bookmakers or gambling services, users are encouraged to
+> display appropriate responsible gambling messaging (e.g., "Gamble Responsibly. 18+") on
+> their customer-facing platforms.
 
-Mitigations already specified in the integration doc: CORS restricted to
-`https://monsterbet.ai`, the endpoint undocumented publicly, no third-party keys.
-That is very likely fine — it is our own front end, not a data product — but it is worth
-one email to their support asking for confirmation that serving our own first-party page
-from our own JSON endpoint is in scope. Their terms invite exactly this question. **Do not
-launch paid traffic against the board until that reply is in hand.**
+The page footer already carries "18+; know your local laws and play responsibly."
 
-## Alternatives considered
+### 2. FanDuel, DraftKings and BetMGM — NFL spread, moneyline, total
 
-| Provider | Cost | Activation | Verdict |
+From <https://the-odds-api.com/sports-odds-data/bookmaker-apis.html>, US region:
+
+| Region key | Bookmaker key | Bookmaker | Tier restriction |
 |---|---|---|---|
-| **OddsBlaze** | $29–$999/mo; the $29 tier carries ~2-minute delay, sub-second needs $249+ | self-serve, same day | Viable fallback. Terms of service on redistribution are **not published** — would need to be confirmed before use, which costs us the time advantage. |
-| **SportsDataIO** | No public price for the commercial real-time feed. Their listed "Discovery Lab Odds" plan ($99/mo, $599/yr) is **next-day delayed and not licensed for commercial redistribution**, so it cannot serve this page. | Sales quote + contract — days to weeks | Best long-term fit (official NFL workflow, consensus lines, injuries, props) but cannot be live for Week 1. Worth opening the conversation now for the 2027 season. |
-| **OddsJam** | Reported ~$4,995/mo, quote-gated | sales call | Out of budget by ~40×. |
-| **OpticOdds** | Reported ~$5,000/mo per sport, quote-gated | sales call | Out of budget. |
-| **Sportradar / LSports** | Enterprise, quote only | weeks, incl. compliance review | Not achievable this week. |
+| `us` | `fanduel` | FanDuel | none |
+| `us` | `draftkings` | DraftKings | none |
+| `us` | `betmgm` | BetMGM | none |
 
-The OddsJam and OpticOdds figures come from third-party comparison articles, not from the
-vendors — treat them as indicative only. Neither publishes pricing.
+None of the three carries the "Only available on paid subscriptions" note that Caesars,
+Fanatics and ReBet carry, so all three are present on every tier.
 
-## What Rémi needs to decide
+From <https://the-odds-api.com/sports-odds-data/betting-markets.html>, Featured Betting
+Markets:
 
-1. **Approve $119/month for The Odds API 5M plan** (and name the card — the AmEx that
-   killed the Google Ads / GCP / Workspace billing must not be used here).
-2. **Approve the licence email** asking The Odds API to confirm the first-party
-   `/v1/nfl/board` endpoint is in scope.
-3. Confirm whether player props are in scope for launch or deferred — props use a
-   different endpoint and change the credit maths.
+| Market key | Market names |
+|---|---|
+| `h2h` | Head to head, Moneyline |
+| `spreads` | Points spread, Handicap |
+| `totals` | Total points/goals, Over/Under |
 
-Once 1 and 2 are answered, XenArb ingestion is roughly a day of work, and the six-part
-evidence gate in `XENARB-NFL-INTEGRATION.md` governs when `xenarb-config.js` flips to
-`enabled: true`.
+> spreads and totals markets are mainly available for US sports and bookmakers at this time.
+
+NFL is a US sport and the sport key is `americanfootball_nfl`, which appears in the
+provider's own homepage response sample alongside a `fanduel` bookmaker block.
+
+### 3. Refresh frequency and quota calculation
+
+Cost formula, from the v4 documentation: `credits = [markets] × [regions]`.
+Our board is 3 markets × 1 region = **3 credits per request**.
+
+The shipped poller defaults to 60 seconds, tightening to 30 seconds while a game is live or
+within 60 minutes of kickoff:
+
+| Window | Hours / week | Interval | Requests / week |
+|---|---|---|---|
+| Live + 60 min pre-kickoff (Thu / Sun / Mon) | ~19 | 30s | 2,280 |
+| Remainder | ~149 | 60s | 8,940 |
+| **Total** | 168 | | **11,220** |
+
+- **33,660 credits per week** (11,220 × 3)
+- **≈ 145,900 credits per month** (33,660 × 52 ÷ 12)
+
+That exceeds the 100K plan, which is why the 5M plan is the purchase. Utilisation on 5M is
+**2.9%**, leaving room for retries, a second sport, and any runaway-poller incident.
+
+For completeness: the $59 100K plan fits only at a flat 2-minute interval
+(5,040 requests/week → 15,120 credits/week → ~65,700/month, 66% utilisation). A two-minute-old
+line is a poor foundation for a product whose selling point is line movement, and the
+saving is $60/month.
+
+**Not published:** the provider documents a 1-minute update interval for *additional*
+markets but publishes no refresh SLA for featured markets. Every quote carries the
+provider's own `last_update`, which the board surfaces verbatim. Confirming the featured-market
+cadence is one of the questions in the email below.
+
+### 4. Written confirmation covering the private CORS-restricted endpoint
+
+**PENDING — this is the one remaining blocker.**
+
+Our static front end cannot hold an API key, so XenArb exposes `GET /v1/nfl/board`. The
+Restrictions clause names "offering our data through your own API" as prohibited. Our
+endpoint is the transport layer of our own site, not a product offered to others, but that
+is our reading and not theirs.
+
+Email sent 2026-09-01 to `team@the-odds-api.com`, the address published in their terms,
+which also state "If you are unsure whether your use case is permitted, please contact us."
+Gmail message id `1a05e2a741c8e5df`. It sets out the exact intended use, the endpoint's
+CORS lock, the absence of third-party credentials, and asks for confirmation or for the
+arrangement they would accept instead. It also asks the two open technical questions
+(featured-market refresh interval; rate limits beyond the credit quota).
+
+**Do not purchase until that reply is in hand.**
+
+---
+
+## Alternatives, for the record
+
+| Provider | Cost | Activation | Why not |
+|---|---|---|---|
+| SportsGameOdds — Rookie | $99 /mo | Self-serve | Was the right call while The Odds API's terms were silent. Now costs less for an equivalent express display right elsewhere, and the same "no data dumps, feeds or white-label" restriction applies to our endpoint, so it does not remove the pending question either. |
+| OddsBlaze | $29–$999 /mo | Self-serve | $29 tier runs ~2 minutes behind; sub-second needs $249+. Redistribution terms not published. |
+| SportsDataIO | Quote only | Days to weeks | Best long-term feed. Cannot activate before Week 1. Its public $99/mo Discovery Lab plan is next-day delayed and not licensed for commercial redistribution. |
+| OddsJam | ~$4,995 /mo | Sales call | ~40× budget. Third-party price report; they publish none. |
+| OpticOdds | ~$5,000 /mo per sport | Sales call | Same. |
+| Sportradar / LSports | Quote only | Weeks + compliance | Not achievable this week at any price. |
+
+---
+
+## Same-day activation sequence
+
+The integration is already built and tested behind a disabled flag
+(`/home/xenhive/xenarb/src/nfl/`, 30/30 offline self-test passing). Once the reply arrives:
+
+1. Reply confirms the endpoint → subscribe to the 5M plan at
+   <https://dash.the-odds-api.com/>; key arrives by email. *(~5 min)*
+2. Put the key in `/home/xenhive/xenarb/.env` as `THE_ODDS_API_KEY`, set
+   `NFL_ENABLED=true`. *(~2 min)*
+3. `pm2 start ecosystem.config.cjs --only xenarb-nfl-board`. *(~1 min)*
+4. Run the six-part production evidence gate in `XENARB-NFL-INTEGRATION.md`. *(~30 min)*
+5. Only if all six pass: set `enabled: true` and `apiBase` in `xenarb-config.js`, merge
+   PR #5. *(~5 min)*
+
+If the reply instead says the endpoint is out of scope, step 1 becomes server-side rendering
+or signed requests to that endpoint; nothing else in the pipeline changes, and the flag stays off.
+
+**Until a licensed historical backfill has been run and verified, the board's column reads
+"First seen", never "Opening".** It is driven by `openingSource` in the board contract, so it
+relabels itself only when XenArb reports `provider_historical`.

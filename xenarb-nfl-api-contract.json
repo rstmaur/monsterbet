@@ -3,93 +3,246 @@
   "$id": "https://monsterbet.ai/contracts/xenarb-nfl-board-v1.json",
   "title": "XenArb NFL board snapshot",
   "type": "object",
-  "required": ["schemaVersion", "provider", "xenarb", "events"],
+  "required": [
+    "schemaVersion",
+    "provider",
+    "xenarb",
+    "openingSource",
+    "events"
+  ],
   "properties": {
-    "schemaVersion": { "const": "1.0" },
-    "weekLabel": { "type": "string" },
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "weekLabel": {
+      "type": "string"
+    },
     "provider": {
       "type": "object",
-      "required": ["name", "timestamp"],
+      "required": [
+        "name",
+        "timestamp"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "name": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "xenarb": {
       "type": "object",
-      "required": ["snapshotId", "ingestedAt"],
+      "required": [
+        "snapshotId",
+        "ingestedAt"
+      ],
       "properties": {
-        "snapshotId": { "type": "string" },
-        "ingestedAt": { "type": "string", "format": "date-time" }
+        "snapshotId": {
+          "type": "string"
+        },
+        "ingestedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "events": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["eventId", "kickoff", "status", "teams", "markets", "intelligence"],
+        "required": [
+          "eventId",
+          "kickoff",
+          "status",
+          "teams",
+          "markets",
+          "intelligence"
+        ],
         "properties": {
-          "eventId": { "type": "string" },
-          "kickoff": { "type": "string", "format": "date-time" },
-          "status": { "enum": ["upcoming", "live", "final", "postponed", "cancelled"] },
+          "eventId": {
+            "type": "string"
+          },
+          "kickoff": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "upcoming",
+              "live",
+              "final",
+              "postponed",
+              "cancelled"
+            ]
+          },
           "teams": {
             "type": "object",
-            "required": ["away", "home"],
-            "properties": { "away": { "type": "string" }, "home": { "type": "string" } }
+            "required": [
+              "away",
+              "home"
+            ],
+            "properties": {
+              "away": {
+                "type": "string"
+              },
+              "home": {
+                "type": "string"
+              }
+            }
           },
-          "hasPlayerProps": { "type": "boolean" },
+          "hasPlayerProps": {
+            "type": "boolean"
+          },
           "markets": {
             "type": "object",
             "properties": {
-              "spread": { "$ref": "#/$defs/market" },
-              "moneyline": { "$ref": "#/$defs/market" },
-              "total": { "$ref": "#/$defs/market" }
+              "spread": {
+                "$ref": "#/$defs/market"
+              },
+              "moneyline": {
+                "$ref": "#/$defs/market"
+              },
+              "total": {
+                "$ref": "#/$defs/market"
+              }
             }
           },
           "intelligence": {
             "type": "object",
-            "required": ["consensusLine", "movementSummary", "sportsbookDisagreement", "unusualMovement", "lastChangedAt"],
+            "required": [
+              "consensusLine",
+              "movementSummary",
+              "sportsbookDisagreement",
+              "unusualMovement",
+              "lastChangedAt"
+            ],
             "properties": {
               "consensusLine": {},
-              "movementSummary": { "type": "string" },
-              "sportsbookDisagreement": { "type": "string" },
-              "unusualMovement": { "type": "boolean" },
-              "lastChangedAt": { "type": "string", "format": "date-time" }
+              "movementSummary": {
+                "type": "string"
+              },
+              "sportsbookDisagreement": {
+                "type": "string"
+              },
+              "unusualMovement": {
+                "type": "boolean"
+              },
+              "lastChangedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
             }
           }
         }
       }
+    },
+    "openingSource": {
+      "enum": [
+        "first_seen",
+        "provider_historical"
+      ],
+      "description": "Provenance of the opening value. first_seen = XenArb's own earliest observation; provider_historical = a licensed opener from the provider's historical endpoint. The UI labels its column First seen unless this is provider_historical."
     }
   },
   "$defs": {
     "quote": {
       "type": "object",
-      "required": ["provider", "sportsbook", "eventId", "marketId", "selection", "value", "price", "impliedProbability", "providerTimestamp", "xenarbIngestedAt"],
+      "required": [
+        "provider",
+        "sportsbook",
+        "eventId",
+        "marketId",
+        "selection",
+        "value",
+        "price",
+        "impliedProbability",
+        "providerTimestamp",
+        "xenarbIngestedAt"
+      ],
       "properties": {
-        "provider": { "type": "string" },
-        "sportsbook": { "type": "string" },
-        "eventId": { "type": "string" },
-        "marketId": { "type": "string" },
-        "selection": { "type": "string" },
+        "provider": {
+          "type": "string"
+        },
+        "sportsbook": {
+          "type": "string"
+        },
+        "eventId": {
+          "type": "string"
+        },
+        "marketId": {
+          "type": "string"
+        },
+        "selection": {
+          "type": "string"
+        },
         "value": {},
         "price": {},
-        "impliedProbability": { "type": "number", "minimum": 0, "maximum": 1 },
-        "providerTimestamp": { "type": "string", "format": "date-time" },
-        "xenarbIngestedAt": { "type": "string", "format": "date-time" }
+        "impliedProbability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "providerTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "xenarbIngestedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "market": {
       "type": "object",
-      "required": ["marketId", "opening", "current", "direction", "movementSize", "lastChangedAt", "books"],
+      "required": [
+        "marketId",
+        "opening",
+        "current",
+        "openingSource",
+        "direction",
+        "movementSize",
+        "lastChangedAt",
+        "books"
+      ],
       "properties": {
-        "marketId": { "type": "string" },
+        "marketId": {
+          "type": "string"
+        },
         "opening": {},
         "current": {},
-        "direction": { "enum": ["up", "down", "unchanged"] },
-        "movementSize": { "type": "number" },
-        "lastChangedAt": { "type": "string", "format": "date-time" },
-        "best": { "$ref": "#/$defs/quote" },
-        "books": { "type": "array", "items": { "$ref": "#/$defs/quote" } }
+        "direction": {
+          "enum": [
+            "up",
+            "down",
+            "unchanged"
+          ]
+        },
+        "movementSize": {
+          "type": "number"
+        },
+        "lastChangedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "best": {
+          "$ref": "#/$defs/quote"
+        },
+        "books": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quote"
+          }
+        },
+        "openingSource": {
+          "enum": [
+            "first_seen",
+            "provider_historical"
+          ],
+          "description": "Provenance of the opening value. first_seen = XenArb's own earliest observation; provider_historical = a licensed opener from the provider's historical endpoint. The UI labels its column First seen unless this is provider_historical."
+        }
       }
     }
   }

@@ -177,6 +177,8 @@ header{
   padding:12px 18px;border-radius:10px;box-shadow:0 8px 26px rgba(57,255,106,.22);white-space:nowrap;
 }
 .nav-cta:hover{transform:translateY(-1px)}
+.nav-buy{display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:0 0 auto}
+.nav-fee{font:600 10px/1.15 var(--sans);color:var(--muted);text-align:center;white-space:nowrap;letter-spacing:.01em}
 .nav-toggle{display:none;background:none;border:1px solid var(--line-2);border-radius:9px;padding:9px 11px;cursor:pointer}
 .nav-toggle span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px}
 .nav-toggle span+span{margin-top:4px}
@@ -390,6 +392,8 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
   .brand{font-size:18px}
   .brand .mark{width:26px;height:26px;border-radius:7px}
   .nav-cta{font-size:12px;padding:10px 12px}
+  .nav-buy{gap:2px}
+  .nav-fee{font-size:9.5px;letter-spacing:0}
   .nav-links{
     display:none;position:absolute;top:70px;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;
     background:rgba(5,6,10,.98);border-bottom:1px solid var(--line);padding:10px 22px 18px;
@@ -425,7 +429,10 @@ footer{border-top:1px solid var(--line);padding:52px 0 44px;background:rgba(3,4,
         <a href="#insights">NFL Insights</a>
         <a href="#faq">FAQ</a>
       </nav>
-      <a class="nav-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-funnel="weekly-subscription" data-product="monstergpt_weekly" data-affiliate="xentraffic">Get Weekly Access</a>
+      <div class="nav-buy">
+        <a class="nav-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-funnel="weekly-subscription" data-product="monstergpt_weekly" data-affiliate="xentraffic">Get Weekly Access</a>
+        <span class="nav-fee">+ 5% Whop service fee</span>
+      </div>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav">
         <span></span><span></span><span></span>
       </button>

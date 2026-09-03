@@ -1,5 +1,10 @@
 # XenArb NFL live-data gate
 
+> **Canonical source: `Xentraffic/xenarb`.** This file is a synchronised copy of
+> `docs/nfl/XENARB-NFL-INTEGRATION.md` in <https://github.com/Xentraffic/xenarb>.
+> Edit it there; changes reach this repository by re-sync, never the other way round.
+> The board contract `xenarb-nfl-api-contract.json` is governed the same way.
+
 ## Current state
 
 Live mode is disabled. `xenarb-config.js` is `enabled: false` and the board renders its
@@ -35,9 +40,13 @@ in **`NFL-ODDS-PROVIDER-DECISION.md`**. Summary:
 - They expressly prohibit reselling it as a standalone data product "through your own API,
   data feed, downloadable files, or any other format intended to serve as a source of raw
   data for others".
-- **Open question, blocking purchase:** whether our first-party `GET /v1/nfl/board`
-  endpoint falls on the permitted side of that line. Email sent 2026-09-01 to
-  `team@the-odds-api.com`; awaiting written reply. Do not subscribe until it arrives.
+- **Resolved 2026-09-02.** The provider answered the licence question in writing
+  (`team@the-odds-api.com`): *"An internal API delivering odds to your application is
+  permitted. The restriction would apply if you offered third parties access to an API or
+  data feed that effectively resells our odds data as a standalone service."* Our
+  CORS-locked first-party `GET /v1/nfl/board` is in scope. Purchase is unblocked.
+  Same reply: featured markets refresh every **40-60s**, and there is a **30 req/sec**
+  rate limit on top of the monthly credit quota.
 
 The production key is `THE_ODDS_API_KEY` in `/home/xenhive/xenarb/.env` on XenHive only.
 Auth is the `apiKey` query parameter, added server-side. It must never reach GitHub Pages
@@ -77,7 +86,8 @@ a backfill has been run *and* verified.
 1. Separate `nfl-provider` subsystem under `/home/xenhive/xenarb/src/nfl/`; no reuse of
    prediction-market or arbitrage records. **Done.**
 2. Poll at the licensed interval, honour quota headers and `429 Retry-After`. **Done** —
-   60s, tightening to 30s while a game is live or within 60 minutes of kickoff.
+   60s. Not tightened inside the game window: the provider refreshes featured markets
+   every 40-60s, so a 30s poll doubles credit cost for identical numbers.
 3. Normalize schedule, teams, kickoff, sportsbook, event ID, market ID, selection, line,
    American price, provider update time and XenArb ingestion time. **Done.**
 4. Persist every changed outcome as an immutable snapshot. **Done** — `data/nfl/quotes.jsonl`,

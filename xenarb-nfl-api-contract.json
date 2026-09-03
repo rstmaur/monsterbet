@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://monsterbet.ai/contracts/xenarb-nfl-board-v1.json",
+  "$comment": "Canonical source: Xentraffic/xenarb (https://github.com/Xentraffic/xenarb), xenarb-nfl-api-contract.json. The copy in rstmaur/monsterbet is synchronised from there and must not be edited in place. Poll cadence of record: src/nfl/config.js in that repository - a flat 60s, per The Odds API's written confirmation of 2026-09-02 that featured markets refresh every 40-60s.",
   "title": "XenArb NFL board snapshot",
   "type": "object",
   "required": [

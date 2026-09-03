@@ -3,6 +3,6 @@ window.MONSTERBET_XENARB = Object.freeze({
   enabled: false,
   apiBase: '',
   transport: 'poll',
-  pollIntervalMs: 30000,
+  pollIntervalMs: 60000,
   staleAfterMs: 120000
 });

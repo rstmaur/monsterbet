@@ -1,7 +1,14 @@
 # NFL odds provider — definitive purchase decision
 
-Rev 2, 2026-09-01. Supersedes Rev 1 and the earlier SportsGameOdds recommendation.
-Nothing has been purchased. No account has been created.
+> **Canonical source: `Xentraffic/xenarb`.** This memo and the board contract
+> `xenarb-nfl-api-contract.json` are maintained in
+> <https://github.com/Xentraffic/xenarb> (`docs/nfl/`). The copies in this
+> repository are synchronised from there and must not be edited in place.
+> The poll cadence of record is `src/nfl/config.js` in that repository.
+
+Rev 3, 2026-09-03. Supersedes Rev 2 and the earlier SportsGameOdds recommendation.
+The licence blocker is **cleared** — the provider confirmed our use case in writing on
+2026-09-02. Nothing has been purchased. No account has been created.
 
 ## The contradiction, and why it happened
 
@@ -125,48 +132,89 @@ provider's own homepage response sample alongside a `fanduel` bookmaker block.
 Cost formula, from the v4 documentation: `credits = [markets] × [regions]`.
 Our board is 3 markets × 1 region = **3 credits per request**.
 
-The shipped poller defaults to 60 seconds, tightening to 30 seconds while a game is live or
-within 60 minutes of kickoff:
+The shipped poller runs at a **flat 60 seconds, round the clock**. It is not tightened
+inside the game window: the provider confirmed in writing on 2026-09-02 that featured
+markets refresh every **40-60 seconds**, so a 30-second poll returns the same numbers at
+twice the credit cost. Rev 2 of this memo assumed a 30s live-window cadence; that
+assumption is withdrawn.
 
 | Window | Hours / week | Interval | Requests / week |
 |---|---|---|---|
-| Live + 60 min pre-kickoff (Thu / Sun / Mon) | ~19 | 30s | 2,280 |
-| Remainder | ~149 | 60s | 8,940 |
-| **Total** | 168 | | **11,220** |
+| All hours, including live and pre-kickoff | 168 | 60s | 10,080 |
+| **Total** | 168 | | **10,080** |
 
-- **33,660 credits per week** (11,220 × 3)
-- **≈ 145,900 credits per month** (33,660 × 52 ÷ 12)
+- **30,240 credits per week** (10,080 × 3)
+- **≈ 131,000 credits per month** (30,240 × 52 ÷ 12; ≈ 129,600 on a flat 30-day month,
+  the figure carried in `src/nfl/config.js` in `Xentraffic/xenarb`)
 
-That exceeds the 100K plan, which is why the 5M plan is the purchase. Utilisation on 5M is
-**2.9%**, leaving room for retries, a second sport, and any runaway-poller incident.
+That still exceeds the 100K plan, so the 5M plan remains the purchase. Utilisation on 5M
+falls from 2.9% to **2.6%**, leaving room for retries, a second sport, and any
+runaway-poller incident.
+
+The provider's separate **30 requests/second** rate limit is confirmed. At one request per
+60 seconds we run at 0.017 req/s — roughly 1,800× under the ceiling — so no poller-side
+throttling is required.
 
 For completeness: the $59 100K plan fits only at a flat 2-minute interval
 (5,040 requests/week → 15,120 credits/week → ~65,700/month, 66% utilisation). A two-minute-old
 line is a poor foundation for a product whose selling point is line movement, and the
 saving is $60/month.
 
-**Not published:** the provider documents a 1-minute update interval for *additional*
-markets but publishes no refresh SLA for featured markets. Every quote carries the
-provider's own `last_update`, which the board surfaces verbatim. Confirming the featured-market
-cadence is one of the questions in the email below.
+**Previously not published, now confirmed in writing:** the provider's public docs give a
+1-minute update interval for *additional* markets and no refresh SLA for featured markets.
+The 2026-09-02 reply supplies it — featured markets refresh every **40-60 seconds**. Every
+quote still carries the provider's own `last_update`, which the board surfaces verbatim.
 
 ### 4. Written confirmation covering the private CORS-restricted endpoint
 
-**PENDING — this is the one remaining blocker.**
+**CLEARED — written approval received 2026-09-02.**
 
 Our static front end cannot hold an API key, so XenArb exposes `GET /v1/nfl/board`. The
-Restrictions clause names "offering our data through your own API" as prohibited. Our
-endpoint is the transport layer of our own site, not a product offered to others, but that
-is our reading and not theirs.
+Restrictions clause names "offering our data through your own API" as prohibited. Rev 2
+flagged this as the one remaining blocker and instructed that nothing be purchased until
+the provider answered. They have answered, and the answer is favourable.
 
-Email sent 2026-09-01 to `team@the-odds-api.com`, the address published in their terms,
-which also state "If you are unsure whether your use case is permitted, please contact us."
-Gmail message id `1a05e2a741c8e5df`. It sets out the exact intended use, the endpoint's
-CORS lock, the absence of third-party credentials, and asks for confirmation or for the
-arrangement they would accept instead. It also asks the two open technical questions
-(featured-market refresh interval; rate limits beyond the credit quota).
+The question was put on 2026-09-01 to `team@the-odds-api.com`, the address published in
+their terms, which also state "If you are unsure whether your use case is permitted, please
+contact us." It set out the exact intended use, the endpoint's CORS lock to
+`https://monsterbet.ai`, and the absence of any third-party credentials.
 
-**Do not purchase until that reply is in hand.**
+**Reply received 2026-09-02 02:28 UTC** from Raphy, The Odds API team
+(`team@the-odds-api.com`). Gmail thread `1a05e2a741c8e5df`, message `1a05ff2d0c864850`.
+Verbatim:
+
+> Your use case sounds well within our Terms of Use. An internal API delivering odds to
+> your application is permitted.
+>
+> The restriction would apply if you offered third parties access to an API or data feed
+> that effectively resells our odds data as a standalone service. Using the data within
+> your own application or user interface, including as part of a paid product, is permitted
+> and doesn't sound like an issue in your case.
+>
+> Answers to your other questions:
+>
+> 1. Featured markets update at intervals between 40 and 60 seconds, depending on proximity
+>    to live games.
+>
+> 2. There's a rate limit of 30 requests per second, explained on this page
+>    [https://the-odds-api.com/guide/rate-limit.html]
+
+That resolves all three open items in one reply:
+
+| Item | Rev 2 status | Now |
+|---|---|---|
+| First-party `GET /v1/nfl/board` endpoint | Open, blocking purchase | **Permitted in writing** |
+| Featured-market refresh interval | Not published | **40-60 seconds** |
+| Rate limit beyond the credit quota | Unknown | **30 requests / second** |
+
+The conditions attached to the approval are ones we already meet and must keep meeting:
+no third party is issued credentials to `/v1/nfl/board`, the endpoint stays CORS-locked to
+our own origin, and the odds are never offered as a standalone data product. If that ever
+changes, the approval no longer covers us and the question must be put again.
+
+The 40-60 second figure is also the direct reason the poller is a flat 60s: see section 3.
+
+**Purchase is unblocked.** It has not been made — see the activation sequence below.
 
 ---
 
@@ -174,9 +222,9 @@ arrangement they would accept instead. It also asks the two open technical quest
 
 | Provider | Cost | Activation | Why not |
 |---|---|---|---|
-| SportsGameOdds — Rookie | $99 /mo | Self-serve | Was the right call while The Odds API's terms were silent. Now costs less for an equivalent express display right elsewhere, and the same "no data dumps, feeds or white-label" restriction applies to our endpoint, so it does not remove the pending question either. |
+| SportsGameOdds — Rookie | $99 /mo | Self-serve | Was the right call while The Odds API's terms were silent. Costs $20/mo more for an equivalent express display right, and its own "no data dumps, feeds or white-label" restriction would have had to be cleared separately — whereas The Odds API has now cleared ours in writing. |
 | OddsBlaze | $29–$999 /mo | Self-serve | $29 tier runs ~2 minutes behind; sub-second needs $249+. Redistribution terms not published. |
-| SportsDataIO | Quote only | Days to weeks | Best long-term feed. Cannot activate before Week 1. Its public $99/mo Discovery Lab plan is next-day delayed and not licensed for commercial redistribution. |
+| SportsDataIO | Quote only | Days to weeks | Superseded. An earlier revision of the Monsterbet PR recommended commercial SportsDataIO access; that recommendation is withdrawn. Cannot activate before Week 1, and its public $99/mo Discovery Lab plan is next-day delayed and not licensed for commercial redistribution. |
 | OddsJam | ~$4,995 /mo | Sales call | ~40× budget. Third-party price report; they publish none. |
 | OpticOdds | ~$5,000 /mo per sport | Sales call | Same. |
 | Sportradar / LSports | Quote only | Weeks + compliance | Not achievable this week at any price. |
@@ -186,19 +234,23 @@ arrangement they would accept instead. It also asks the two open technical quest
 ## Same-day activation sequence
 
 The integration is already built and tested behind a disabled flag
-(`/home/xenhive/xenarb/src/nfl/`, 30/30 offline self-test passing). Once the reply arrives:
+(`Xentraffic/xenarb`, `src/nfl/`, 30/30 offline self-test passing) and the licence blocker
+is cleared. Every step below is still outstanding — nothing has been purchased or started.
 
-1. Reply confirms the endpoint → subscribe to the 5M plan at
-   <https://dash.the-odds-api.com/>; key arrives by email. *(~5 min)*
-2. Put the key in `/home/xenhive/xenarb/.env` as `THE_ODDS_API_KEY`, set
-   `NFL_ENABLED=true`. *(~2 min)*
+1. **Subscribe to the 5M plan, $119/month**, at <https://the-odds-api.com/#get-access>
+   (START resolves to <https://dash.the-odds-api.com/>). The key arrives by email.
+   *(~5 min, requires a payment decision by Rémi)*
+2. Install the key on XenHive **without writing it into the repository or into shell
+   history**:
+   `printf 'THE_ODDS_API_KEY=%s\nNFL_ENABLED=true\n' '<PASTE_KEY_HERE>' >> /home/xenhive/xenarb/.env`
+   `.env` is git-ignored; `provider.js` redacts the key from every log line. *(~2 min)*
 3. `pm2 start ecosystem.config.cjs --only xenarb-nfl-board`. *(~1 min)*
 4. Run the six-part production evidence gate in `XENARB-NFL-INTEGRATION.md`. *(~30 min)*
 5. Only if all six pass: set `enabled: true` and `apiBase` in `xenarb-config.js`, merge
-   PR #5. *(~5 min)*
+   PR #5, deploy. *(~5 min)*
 
-If the reply instead says the endpoint is out of scope, step 1 becomes server-side rendering
-or signed requests to that endpoint; nothing else in the pipeline changes, and the flag stays off.
+The fallback path in Rev 2 — server-side rendering or signed requests, in case the endpoint
+was ruled out of scope — is no longer needed. The endpoint was approved as built.
 
 **Until a licensed historical backfill has been run and verified, the board's column reads
 "First seen", never "Opening".** It is driven by `openingSource` in the board contract, so it

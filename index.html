@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-feed="updating">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NFL Odds & Intelligence — MonsterGPT | Monster.bet</title>
-<meta name="description" content="NFL odds-and-intelligence interface for verified XenArb matchup data, line movement context and MonsterGPT research. Live data remains disabled until the provider feed is verified.">
+<meta name="description" content="NFL odds board and MonsterGPT research: matchup analysis, injury context, situational trends and line-movement study. Odds appear only when verified.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta name="theme-color" content="#100b19">
 <link rel="canonical" href="https://monsterbet.ai/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Monster.bet"><meta property="og:url" content="https://monsterbet.ai/">
-<meta property="og:title" content="NFL Odds & Intelligence — MonsterGPT"><meta property="og:description" content="A compact NFL research board designed for verified XenArb data. Live values remain disabled until the provider feed is verified.">
+<meta property="og:title" content="NFL Odds & Intelligence — MonsterGPT"><meta property="og:description" content="An NFL odds board paired with MonsterGPT research on matchups, injuries, trends and line movement.">
 <meta property="og:image" content="https://monsterbet.ai/og-image.png"><meta name="twitter:card" content="summary_large_image">
-<script src="/xenarb-config.js"></script>
+<script src="/board-config.js"></script>
 <style>
 :root{--open-label:"First seen ";--bg:#100b19;--bg2:#171020;--panel:#21162f;--panel2:#2a1b3b;--line:#49355e;--text:#f7f3ff;--muted:#b8aec8;--faint:#81758f;--green:#52ff7a;--green2:#a7ff6a;--purple:#b465ff;--danger:#ff6b80;--radius:12px;--max:1400px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#171020 0,#100b19 360px,#0d0914 100%);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}button{font:inherit}.wrap{max-width:var(--max);margin:auto;padding:0 24px}
@@ -108,7 +108,7 @@
   .board-title a{padding:0 12px;margin-left:0}
   .sticky-cta a{padding:9px 14px}
   .wk-nav{width:44px;height:44px;font-size:18px}
-  .mkt,.filter{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+  .mkt,.filter,.analyze{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
   /* The strip scrolls horizontally, so stop flex from shrinking a pill back
      below its own padding and rounding it into a circle. */
   .filter{padding:0 18px;flex:0 0 auto}
@@ -121,20 +121,60 @@
   .day{min-height:44px;display:inline-flex;align-items:center}
   .disclaimer{padding-bottom:116px}
 }
+
+/* ── Feed state ──────────────────────────────────────────────────────────────
+   <html> carries data-feed = updating | live | delayed. The markup ships as
+   "updating" so the correct face renders before any script runs, and the board
+   returns on its own the moment a verified snapshot sets data-feed="live" —
+   nothing here needs a deploy to switch over. Elements marked .board-only
+   belong to the odds board; they are present but not rendered while updating,
+   so their structure, ids and the First seen -> Current column survive intact
+   for activation. */
+:root[data-feed="updating"] .board-only,
+:root[data-feed="updating"] .nav-board,
+:root[data-feed="updating"] .utility{display:none}
+:root[data-feed="live"] .research,
+:root[data-feed="delayed"] .research{display:none}
+
+/* The research panel occupies the board's grid cell, so the rail (and the CTA
+   in it) keeps its place either way. */
+.research{border:1px solid var(--line);border-radius:var(--radius);background:
+  radial-gradient(120% 140% at 0% 0%,#2a1a3c 0%,var(--panel) 58%);overflow:hidden}
+.research-head{padding:26px 26px 20px;border-bottom:1px solid var(--line)}
+.research-eyebrow{display:inline-block;color:var(--green);font-size:11px;font-weight:850;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.research-head h2{margin:0 0 9px;font-size:23px;letter-spacing:-.02em;line-height:1.2}
+.research-head p{margin:0;color:var(--muted);max-width:62ch;line-height:1.55}
+.research-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.rcard{background:var(--panel);padding:20px 22px}
+.rnum{display:block;color:var(--faint);font-size:10.5px;font-weight:850;letter-spacing:.12em;margin-bottom:9px}
+.rcard h3{margin:0 0 7px;font-size:14.5px}
+.rcard p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.62}
+.research-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:17px 22px;border-top:1px solid var(--line);background:#1c1329;flex-wrap:wrap}
+.research-foot-l strong{display:block;font-size:14px}
+.research-foot-l small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.research-cta{background:linear-gradient(100deg,var(--green2),var(--green));color:#07140a;
+  border-radius:9px;padding:12px 20px;font-weight:850;white-space:nowrap}
+@media(max-width:860px){.research-grid{grid-template-columns:1fr}
+  .research-head{padding:20px 18px 16px}.research-head h2{font-size:19px}
+  .rcard{padding:16px 18px}.research-foot{padding:15px 18px}
+  .research-cta{width:100%;text-align:center;min-height:44px;display:inline-flex;
+    align-items:center;justify-content:center}}
 </style>
 </head>
 <body>
-<div class="utility"><div class="wrap"><span id="globalStatus"><i class="status-dot"></i>Live NFL data temporarily unavailable</span><span id="globalTimestamp">No verified XenArb snapshot received</span></div></div>
-<header class="topbar"><div class="wrap"><a class="brand" href="#top">MONSTER<b>.BET</b></a><nav class="nav" aria-label="Primary"><a class="active" href="#odds">Odds Board</a><a href="#comparison">Line Movement</a><a href="#sportsbooks">Sportsbooks</a><a href="#insights">NFL Insights</a><a href="#monster">MonsterGPT</a><a href="#pricing">Pricing</a></nav><div class="nav-buy"><a class="subscribe" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT · $27</a><span class="nav-fee">+ 5% Whop service fee</span></div></div></header>
+<div class="utility"><div class="wrap"><span id="globalStatus"><i class="status-dot"></i></span><span id="globalTimestamp"></span></div></div>
+<header class="topbar"><div class="wrap"><a class="brand" href="#top">MONSTER<b>.BET</b></a><nav class="nav" aria-label="Primary"><a class="active" href="#odds">Odds Board</a><a class="nav-board" href="#comparison">Line Movement</a><a class="nav-board" href="#sportsbooks">Sportsbooks</a><a href="#insights">NFL Insights</a><a href="#monster">MonsterGPT</a><a href="#pricing">Pricing</a></nav><div class="nav-buy"><a class="subscribe" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT · $27</a><span class="nav-fee">+ 5% Whop service fee</span></div></div></header>
 <main id="top">
-<section class="mast"><div class="wrap mastbar"><div class="mastbar-l"><span class="crumb">NFL Odds &amp; Intelligence</span><span class="fee-chip">Whop applies a 5% service fee at checkout.</span></div><div class="feed-state feed-status" id="feedStatus"><strong>Live NFL data temporarily unavailable</strong>XenArb has no approved provider-backed NFL snapshot.</div></div></section>
+<section class="mast"><div class="wrap mastbar"><div class="mastbar-l"><span class="crumb">NFL Odds &amp; Intelligence</span><span class="fee-chip">Whop applies a 5% service fee at checkout.</span></div><div class="feed-state feed-status" id="feedStatus"><strong>NFL odds board updating — check back shortly</strong><span id="feedDetail"></span></div></div></section>
 <div class="wrap" id="odds">
-<section class="controls" aria-label="Board controls"><div class="weekbar"><button class="wk-nav" id="wkPrev" aria-label="Previous week" disabled>&lsaquo;</button><div class="wk"><span class="wk-name" id="weekLabel">NFL &middot; Awaiting feed</span><span class="wk-range"><b id="weekDates">No verified snapshot</b><i id="weekUpdated"></i></span></div><button class="wk-nav" id="wkNext" aria-label="Next week" disabled>&rsaquo;</button><div class="daystrip" id="dayStrip"></div></div><div class="marketbar"><div class="mkt-tabs" role="tablist" aria-label="Market"><button class="mkt active" data-market="spread" role="tab" aria-selected="true">Spread</button><button class="mkt" data-market="moneyline" role="tab" aria-selected="false">Moneyline</button><button class="mkt" data-market="total" role="tab" aria-selected="false">Total</button></div><div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="primetime">Primetime</button><button class="filter" data-filter="props">Props</button></div></div></section>
-<div class="board-layout"><section class="board"><div class="board-title"><h2 id="boardHeading">NFL Matchups</h2><div><span id="boardTimestamp">No verified data</span><span class="fee-tag">+ 5% Whop service fee</span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Unlock MonsterGPT</a></div></div><div class="columns"><span>Matchup</span><span id="colOpen">First seen</span><span>Move</span><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span><span>MonsterGPT</span></div><div id="games"><div class="empty-state"><strong>Live NFL data temporarily unavailable</strong><p>The board will remain empty until XenArb receives and validates a licensed NFL provider snapshot.</p></div></div></section><aside class="side"><div class="side-card" id="monster"><h3>MonsterGPT Research Access</h3><p>Ask about verified matchup context, injuries, player roles, trends and line movement. MonsterGPT does not accept or place wagers.</p><p class="fee-line">Whop applies a 5% service fee at checkout.</p><a class="mini-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Weekly access · $27</a></div><div class="side-card"><h3>Board status</h3><div class="legend"><div><span>Source</span><small>XenArb only</small></div><div><span>Updates</span><small>SSE or compliant polling</small></div><div><span>Stale records</span><small>Labelled Delayed</small></div></div></div></aside></div></div>
-<section class="comparison" id="comparison"><div class="wrap"><div class="section-head"><div><h2>Sportsbook line comparison</h2><p>FanDuel Sportsbook, DraftKings Sportsbook and BetMGM values appear only when supplied and timestamped by XenArb.</p></div><span class="badge" id="comparisonStatus">Live NFL data temporarily unavailable</span></div><div class="table-wrap"><table><thead><tr><th>Market</th><th class="col-fd">FanDuel</th><th>DraftKings</th><th>BetMGM</th><th id="thOpen">First seen → Current</th></tr></thead><tbody id="comparisonRows"><tr><td colspan="5">No verified sportsbook comparison data.</td></tr></tbody></table></div><div id="sportsbooks" class="sites"><div class="site-card"><strong>OddsChecker</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div><div class="site-card"><strong>Action Network</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div></div></div></section>
-<section class="insights" id="insights"><div class="wrap"><div class="section-head"><div><h2>NFL intelligence workflow</h2><p>Compact research modules designed to sit beside the odds board.</p></div></div><div class="insights-grid"><article class="insight"><b>Matchup intelligence</b><h3>Frame how styles collide</h3><p>Organize pace, personnel, role and situational questions before drawing conclusions.</p></article><article class="insight"><b>Movement intelligence</b><h3>Read the whole timeline</h3><p>Compare an opening number with later snapshots and identify what requires verification.</p></article><article class="insight"><b>Player research</b><h3>Understand role shape</h3><p>Study usage dependencies and follow-up questions without presenting picks or wagers.</p></article></div></div></section>
+<section class="controls board-only" aria-label="Board controls"><div class="weekbar"><button class="wk-nav" id="wkPrev" aria-label="Previous week" disabled>&lsaquo;</button><div class="wk"><span class="wk-name" id="weekLabel">NFL</span><span class="wk-range"><b id="weekDates">Updating</b><i id="weekUpdated"></i></span></div><button class="wk-nav" id="wkNext" aria-label="Next week" disabled>&rsaquo;</button><div class="daystrip" id="dayStrip"></div></div><div class="marketbar"><div class="mkt-tabs" role="tablist" aria-label="Market"><button class="mkt active" data-market="spread" role="tab" aria-selected="true">Spread</button><button class="mkt" data-market="moneyline" role="tab" aria-selected="false">Moneyline</button><button class="mkt" data-market="total" role="tab" aria-selected="false">Total</button></div><div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="primetime">Primetime</button><button class="filter" data-filter="props">Props</button></div></div></section>
+<div class="board-layout"><section class="board board-only"><div class="board-title"><h2 id="boardHeading">NFL Matchups</h2><div><span id="boardTimestamp"></span><span class="fee-tag">+ 5% Whop service fee</span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Unlock MonsterGPT</a></div></div><div class="columns"><span>Matchup</span><span id="colOpen">First seen</span><span>Move</span><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span><span>MonsterGPT</span></div><div id="games"><div class="empty-state"><strong>NFL odds board updating &mdash; check back shortly</strong><p>No games are listed for this slate yet.</p></div></div></section><section class="research" id="research" aria-label="MonsterGPT NFL research"><div class="research-head"><span class="research-eyebrow">MonsterGPT · NFL research</span><h2>Do the week’s research while the board updates</h2><p>MonsterGPT is a research co-pilot for the NFL slate. It organises the questions worth asking about a game and keeps your reasoning in one place. It does not accept or place wagers, and it does not sell picks.</p></div><div class="research-grid"><article class="rcard"><span class="rnum">01</span><h3>Matchup analysis</h3><p>Work through how two teams actually collide — pace, personnel groupings, pressure and coverage tendencies, and which side of the ball decides the game. Ask follow-ups until the picture holds together.</p></article><article class="rcard"><span class="rnum">02</span><h3>Injury context</h3><p>Go past the status tag. Who absorbs the snaps, which roles change shape, and what a designation actually implies for a game plan rather than for a headline.</p></article><article class="rcard"><span class="rnum">03</span><h3>Situational trends</h3><p>Test a trend before trusting it: sample size, what has changed since, and whether it describes a real edge or a coincidence that reads well.</p></article><article class="rcard"><span class="rnum">04</span><h3>Line-movement research</h3><p>Frame what a move means. Compare where a number started against where it sits, separate injury news from market flow, and decide what still needs verifying.</p></article></div><div class="research-foot"><div class="research-foot-l"><strong>Full MonsterGPT access · $27 / week</strong><small>Whop applies a 5% service fee at checkout.</small></div><a class="research-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Start researching</a></div></section><aside class="side"><div class="side-card" id="monster"><h3>MonsterGPT Research Access</h3><p>Ask about verified matchup context, injuries, player roles, trends and line movement. MonsterGPT does not accept or place wagers.</p><p class="fee-line">Whop applies a 5% service fee at checkout.</p><a class="mini-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Weekly access · $27</a></div><div class="side-card"><h3>What MonsterGPT does</h3><div class="legend"><div><span>Research</span><small>Matchups and injuries</small></div><div><span>Context</span><small>Trends and line moves</small></div><div><span>Never</span><small>Picks or wagers</small></div></div></div></aside></div></div>
+<section class="comparison board-only" id="comparison"><div class="wrap"><div class="section-head"><div><h2>Sportsbook line comparison</h2><p>FanDuel Sportsbook, DraftKings Sportsbook and BetMGM numbers, shown side by side with the time each was published.</p></div><span class="badge" id="comparisonStatus"></span></div><div class="table-wrap"><table><thead><tr><th>Market</th><th class="col-fd">FanDuel</th><th>DraftKings</th><th>BetMGM</th><th id="thOpen">First seen → Current</th></tr></thead><tbody id="comparisonRows"><tr><td colspan="5">Updating.</td></tr></tbody></table></div><div id="sportsbooks" class="sites"><div class="site-card"><strong>OddsChecker</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div><div class="site-card"><strong>Action Network</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div></div></div></section>
+<section class="insights" id="insights"><div class="wrap"><div class="section-head"><div><h2>NFL intelligence workflow</h2><p>Compact research modules designed to sit beside the odds board.</p></div></div><div class="insights-grid"><article class="insight"><b>Matchup intelligence</b><h3>Frame how styles collide</h3><p>Organize pace, personnel, role and situational questions before drawing conclusions.</p></article><article class="insight"><b>Movement intelligence</b><h3>Read the whole timeline</h3><p>Compare where a number opened against where it sits now, and identify what still needs verifying.</p></article><article class="insight"><b>Player research</b><h3>Understand role shape</h3><p>Study usage dependencies and follow-up questions without presenting picks or wagers.</p></article></div></div></section>
 <section class="pricing" id="pricing"><div class="wrap"><div class="section-head"><div><h2>MonsterGPT plans</h2><p>Research access only. MonsterGPT does not accept or place wagers.</p></div></div><p class="fee-note">Whop applies a 5% service fee at checkout.</p><div class="plans"><article class="plan featured"><h3>Weekly</h3><div class="price-big">$27 <span>/ week</span></div><p>Run one complete NFL research week.</p><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get Weekly Access</a></article><article class="plan"><h3>Monthly</h3><div class="price-big">$77 <span>/ month</span></div><p>Keep matchup research organized across the month.</p><a href="https://whop.com/checkout/plan_Ry7eiiyN731pS/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_monthly">Get Monthly Access</a></article><article class="plan"><h3>Yearly</h3><div class="price-big">$770 <span>/ year</span></div><p>Season-long MonsterGPT research access.</p><a href="https://whop.com/checkout/plan_H6s6AeCBGTVY1/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_yearly">Get Yearly Access</a></article></div></div></section>
-<footer class="disclaimer"><div class="wrap"><p><strong>Checkout pricing:</strong> Whop applies a 5% service fee at checkout. Plan prices shown are $27 / week, $77 / month and $770 / year before that fee.</p><p><strong>Data integrity:</strong> Monster.bet displays NFL values only when returned by the configured XenArb API with provider and ingestion timestamps. Stale snapshots are labelled Delayed; absent or invalid feeds leave the board empty.</p><p><strong>Independent product:</strong> Monster.bet is not affiliated with, endorsed by or sponsored by the NFL, any team, player, sportsbook, OddsChecker or Action Network. Third-party names appear as text-only interface references.</p><p><strong>Responsible use:</strong> MonsterGPT provides research organization and context only. It does not accept or place wagers, provide picks, guarantee outcomes or provide financial advice. 18+; know your local laws and play responsibly.</p></div></footer>
+<footer class="disclaimer"><div class="wrap"><p><strong>Checkout pricing:</strong> Whop applies a 5% service fee at checkout. Plan prices shown are $27 / week, $77 / month and $770 / year before that fee.</p><p><strong>Data integrity:</strong> Monster.bet shows NFL odds only when they come from a verified source, together with the time they were published. Odds that are no longer current are labelled. When no verified odds are available the board is hidden — never filled with estimates, samples or placeholder numbers.</p><p><strong>Independent product:</strong> Monster.bet is not affiliated with, endorsed by or sponsored by the NFL, any team, player, sportsbook, OddsChecker or Action Network. Third-party names appear as text-only interface references.</p><p><strong>Responsible use:</strong> MonsterGPT provides research organization and context only. It does not accept or place wagers, provide picks, guarantee outcomes or provide financial advice. 18+; know your local laws and play responsibly.</p></div></footer>
 </main>
 <div class="sticky-cta"><span>MonsterGPT <small>NFL research co-pilot</small><small class="fee-mini">+ 5% Whop service fee</small></span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get $27 Weekly</a></div>
 <script>
@@ -145,7 +185,7 @@
   var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
   var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content'];
-  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.intel')?'matchup_analysis':a.closest('.side')?'board_rail':'odds_board'}
+  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.research')?'research_panel':a.closest('.intel')?'matchup_analysis':a.closest('.side')?'board_rail':'odds_board'}
   function decorateCta(a){
     if(!a||a.dataset.ctaBound==='1')return a;
     a.dataset.ctaBound='1';
@@ -160,12 +200,26 @@
     return a}
   function decorateAllCtas(root){(root||document).querySelectorAll('a[data-product]').forEach(decorateCta)}
   decorateAllCtas(document);
-  var feed=window.MONSTERBET_XENARB||{}, lastVerified=null, retryMs=5000, pollTimer=null;
+  var feed=window.MONSTERBET_BOARD||{}, lastVerified=null, retryMs=5000, pollTimer=null;
   function text(el,value){if(el&&el.textContent!==String(value??'—'))el.textContent=String(value??'—')}
   function formatLine(best){if(!best)return '—';return [best.selection,best.value,best.price].filter(function(v){return v!==null&&v!==undefined&&v!==''}).join(' · ')}
   function validTrace(best){return best&&best.provider&&best.sportsbook&&best.eventId&&best.marketId&&best.selection&&best.providerTimestamp&&best.xenarbIngestedAt}
   function validSnapshot(s){return s&&s.schemaVersion==='1.0'&&s.provider&&s.provider.name&&s.provider.timestamp&&s.xenarb&&s.xenarb.ingestedAt&&Array.isArray(s.events)&&s.events.every(function(e){return e.eventId&&e.kickoff&&e.teams&&e.teams.away&&e.teams.home&&e.markets&&['spread','moneyline','total'].every(function(k){var m=e.markets[k];return !m||(m.marketId&&m.opening!==undefined&&m.current!==undefined&&m.lastChangedAt&&(!m.best||validTrace(m.best)))})})}
-  function setStatus(mode,message,timestamp){var box=document.getElementById('feedStatus'),global=document.getElementById('globalStatus');box.className='feed-state feed-status '+mode;text(box.querySelector('strong'),mode==='live'?'XenArb verified feed online':mode==='delayed'?'Delayed':'Live NFL data temporarily unavailable');box.childNodes[1].nodeValue=message;text(global,(mode==='live'?'Live via XenArb':mode==='delayed'?'Delayed XenArb snapshot':'Live NFL data temporarily unavailable'));text(document.getElementById('globalTimestamp'),timestamp||'No verified XenArb snapshot received');text(document.getElementById('comparisonStatus'),mode==='live'?'Verified XenArb data':mode==='delayed'?'Delayed — original timestamp shown':'Live NFL data temporarily unavailable')}
+  // The one status string the visitor ever sees while there is nothing to show.
+  var UPDATING='NFL odds board updating \u2014 check back shortly';
+  // mode: 'updating' hides the board and shows research; 'live'/'delayed' reveal
+  // the board. Nothing here names an internal system, a vendor or a contract.
+  function setStatus(mode,message,timestamp){
+    var box=document.getElementById('feedStatus'),global=document.getElementById('globalStatus');
+    var state=(mode==='live'||mode==='delayed')?mode:'updating';
+    document.documentElement.setAttribute('data-feed',state);
+    box.className='feed-state feed-status '+state;
+    text(box.querySelector('strong'),state==='live'?'Odds updated':state==='delayed'?'Odds may not be current':UPDATING);
+    text(document.getElementById('feedDetail'),state==='updating'?'':(message||''));
+    text(global,state==='updating'?'':(state==='live'?'Odds updated':'Odds may not be current'));
+    text(document.getElementById('globalTimestamp'),state==='updating'?'':(timestamp||''));
+    text(document.getElementById('comparisonStatus'),state==='live'?'Updated':state==='delayed'?'May not be current':'');
+  }
   var BOOKS=['FanDuel','DraftKings','BetMGM'];
   var activeMarket='spread', lastEvents=null;
   function quoteFor(m,book){if(!m||!Array.isArray(m.books))return null;
@@ -204,7 +258,7 @@
     var i=e.intelligence||{};
     [['MonsterGPT · line movement',i.movementSummary],['MonsterGPT · book disagreement',i.sportsbookDisagreement]].forEach(function(pair){
       var box=document.createElement('div');var h=document.createElement('h4');text(h,pair[0]);
-      var p=document.createElement('p');text(p,pair[1]||'Not supplied by XenArb for this event.');
+      var p=document.createElement('p');text(p,pair[1]||'Not available for this game.');
       box.append(h,p);inner.appendChild(box)});
     var meta=document.createElement('div');var mh=document.createElement('h4');text(mh,'Trace');
     var mp=document.createElement('p');text(mp,m?('Market '+m.marketId+' · last changed '+m.lastChangedAt):'No market trace available.');
@@ -225,13 +279,13 @@
   function renderBoard(){var games=document.getElementById('games');games.replaceChildren();
     if(!lastEvents||!lastEvents.length){var empty=document.createElement('div');empty.className='empty-state';
       var st=document.createElement('strong'),p=document.createElement('p');
-      text(st,'Live NFL data temporarily unavailable');
-      text(p,'The board will remain empty until XenArb receives and validates a licensed NFL provider snapshot.');
+      text(st,UPDATING);
+      text(p,'No games are listed for this slate yet.');
       empty.append(st,p);games.appendChild(empty);return}
     lastEvents.forEach(function(e){games.appendChild(gameCard(e))});
     applyFilter(document.querySelector('.filter.active')?.dataset.filter||'all')}
   function renderSnapshot(s,forcedMode){var providerTime=new Date(s.provider.timestamp),age=Date.now()-providerTime.getTime(),staleAfter=Number(feed.staleAfterMs)||120000,mode=forcedMode||(age>staleAfter?'delayed':'live');
-    setStatus(mode,mode==='delayed'?'Most recent verified snapshot retained; values are not current.':'Values validated and served by XenArb.',(mode==='delayed'?'Original provider time: ':'Last updated: ')+providerTime.toLocaleString());
+    setStatus(mode,mode==='delayed'?'Showing the last verified odds; they may have moved since.':'',(mode==='delayed'?'Published: ':'Updated: ')+providerTime.toLocaleString());
     var licensedOpener=s.openingSource==='provider_historical';
     var openWord=licensedOpener?'Opening':'First seen';
     document.documentElement.style.setProperty('--open-label','"'+openWord+' "');
@@ -253,7 +307,7 @@
     document.querySelectorAll('.mkt').forEach(function(x){x.classList.remove('active');x.setAttribute('aria-selected','false')});
     b.classList.add('active');b.setAttribute('aria-selected','true');activeMarket=b.dataset.market;renderBoard()})});
   document.querySelectorAll('.filter').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.filter').forEach(function(x){x.classList.remove('active')});b.classList.add('active');applyFilter(b.dataset.filter)})});
-  async function poll(){if(!feed.enabled||!feed.apiBase){setStatus('unavailable','Live mode is disabled until a licensed provider and XenArb endpoint are configured.');return}try{var response=await fetch(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/board',{headers:{Accept:'application/json'},cache:'no-store'});if(response.status===429){var wait=Number(response.headers.get('Retry-After'))*1000||retryMs;throw Object.assign(new Error('rate_limited'),{retryAfter:wait})}if(!response.ok)throw new Error('xenarb_http_'+response.status);var snapshot=await response.json();if(!validSnapshot(snapshot))throw new Error('invalid_xenarb_schema');lastVerified=snapshot;retryMs=5000;renderSnapshot(snapshot);pollTimer=setTimeout(poll,Number(feed.pollIntervalMs)||60000)}catch(error){if(lastVerified)renderSnapshot(lastVerified,'delayed');else setStatus('unavailable','XenArb did not return a valid provider-backed snapshot.');retryMs=Math.min(error.retryAfter||retryMs*2,60000);pollTimer=setTimeout(poll,retryMs)}}
+  async function poll(){if(!feed.enabled||!feed.apiBase){setStatus('updating');return}try{var response=await fetch(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/board',{headers:{Accept:'application/json'},cache:'no-store'});if(response.status===429){var wait=Number(response.headers.get('Retry-After'))*1000||retryMs;throw Object.assign(new Error('rate_limited'),{retryAfter:wait})}if(!response.ok)throw new Error('board_http_'+response.status);var snapshot=await response.json();if(!validSnapshot(snapshot))throw new Error('invalid_board_schema');lastVerified=snapshot;retryMs=5000;renderSnapshot(snapshot);pollTimer=setTimeout(poll,Number(feed.pollIntervalMs)||60000)}catch(error){if(lastVerified)renderSnapshot(lastVerified,'delayed');else setStatus('updating');retryMs=Math.min(error.retryAfter||retryMs*2,60000);pollTimer=setTimeout(poll,retryMs)}}
   function start(){if(feed.enabled&&feed.transport==='sse'&&feed.apiBase){var stream=new EventSource(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/stream');stream.addEventListener('snapshot',function(e){try{var s=JSON.parse(e.data);if(validSnapshot(s)){lastVerified=s;renderSnapshot(s)}}catch(_){} });stream.onerror=function(){stream.close();poll()}}else poll()}
   start();
 })();

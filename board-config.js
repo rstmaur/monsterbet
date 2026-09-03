@@ -1,5 +1,5 @@
 /* Public runtime configuration only. Never put provider credentials here. */
-window.MONSTERBET_XENARB = Object.freeze({
+window.MONSTERBET_BOARD = Object.freeze({
   enabled: false,
   apiBase: '',
   transport: 'poll',

@@ -95,6 +95,32 @@
 .intel-cta small{display:block;color:var(--muted);font-weight:700;font-size:10.5px;margin-top:2px}
 .intel-cta a{background:linear-gradient(100deg,var(--green2),var(--green));color:#07140a;border-radius:8px;padding:8px 16px;font-weight:850;font-size:12px;white-space:nowrap}
 .empty-state{padding:54px 22px;text-align:center}.empty-state strong{display:block;font-size:18px;margin-bottom:7px}.empty-state p{color:var(--muted);margin:0 auto;max-width:620px}.feed-status.live{border-color:#2f8d49;background:#14251a;color:var(--green)}.feed-status.delayed{border-color:#7b5d20;background:#2a2216;color:#ffcf75}.trace{margin-top:7px;color:var(--faint);font-size:10px}.trace code{color:var(--muted)}
+
+/* Touch targets. Every tappable control clears 44x44 CSS px on a handset, per
+   WCAG 2.2 Target Size (Minimum). Placed last so it wins over the narrow
+   paddings the compact mobile layout sets above; only the hit box grows, the
+   type scale and the layout are untouched. */
+@media(max-width:720px){
+  .subscribe,.mini-cta,.plan a,.sticky-cta a,.board-title a,.intel-cta a{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:44px;box-sizing:border-box}
+  .mini-cta,.plan a{display:flex;width:100%}
+  .board-title a{padding:0 12px;margin-left:0}
+  .sticky-cta a{padding:9px 14px}
+  .wk-nav{width:44px;height:44px;font-size:18px}
+  .mkt,.filter{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+  /* The strip scrolls horizontally, so stop flex from shrinking a pill back
+     below its own padding and rounding it into a circle. */
+  .filter{padding:0 18px;flex:0 0 auto}
+  .mkt{flex:0 0 auto}
+  .brand{min-height:44px;display:inline-flex;align-items:center}
+  /* The 44px button is taller than the old fixed 52px bar, so let the bar grow
+     with its contents instead of letting the CTA spill over the utility strip. */
+  .topbar .wrap{height:auto;min-height:52px;padding-top:5px;padding-bottom:5px}
+  .nav-buy{display:flex;flex-direction:column;align-items:stretch}
+  .day{min-height:44px;display:inline-flex;align-items:center}
+  .disclaimer{padding-bottom:116px}
+}
 </style>
 </head>
 <body>

@@ -3,459 +3,633 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NFL Week 1 Odds &amp; Intelligence — MonsterGPT | Monster.bet</title>
-<meta name="description" content="NFL Week 1 odds board and MonsterGPT research: matchup analysis, injury context, player research and line-movement study. Odds appear only when verified.">
+<title>NFL Odds &amp; Line Movement — FanDuel, DraftKings, BetMGM | Monster.bet</title>
+<meta name="description" content="Compare NFL spreads, moneylines and totals across FanDuel, DraftKings and BetMGM, with line movement and MonsterGPT matchup research. Odds appear only when verified.">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta name="theme-color" content="#0b1b33">
+<meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://monsterbet.ai/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Monster.bet"><meta property="og:url" content="https://monsterbet.ai/">
-<meta property="og:title" content="NFL Week 1 Odds &amp; Intelligence — MonsterGPT"><meta property="og:description" content="An NFL Week 1 odds board paired with MonsterGPT research on matchups, injuries, players and line movement.">
+<meta property="og:title" content="NFL Odds &amp; Line Movement — Monster.bet"><meta property="og:description" content="NFL spreads, moneylines and totals compared across FanDuel, DraftKings and BetMGM, with line movement and MonsterGPT research.">
 <meta property="og:image" content="https://monsterbet.ai/og-image.png"><meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
 <script src="/board-config.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
-   Monster.bet — light sportsbook interface.
-   Surfaces are white / light grey, type is dark navy, Monster green carries
-   every action, purple appears only as a restrained brand accent.
+   Monster.bet — NFL odds comparison interface.
+
+   Light only, by design: white and light-grey surfaces, navy type, Monster
+   green on every action, purple reserved for a single brand accent. Dense
+   sportsbook rhythm — small type, tight rows, hairline rules — so the board
+   reads as a data table rather than a marketing page.
+
+   The board's DOM is built by the renderer at the foot of this file. Anything
+   named .game / .game-row / .bk / .mv / .opn / .intel / .empty-state is styled
+   here but created there; do not rename without changing both.
    ═══════════════════════════════════════════════════════════════════════════ */
+
 :root{
+  /* surfaces */
+  --white:#FFFFFF;
+  --grey:#F4F6F9;
+  --grey-2:#EDF1F6;
+  --grey-3:#E4EAF2;
+  --line:#DCE3ED;
+  --line-2:#C6D1E0;
+
+  /* type */
+  --navy:#0B1B33;
+  --navy-2:#1B3159;
+  --mid:#4C5D78;
+  --soft:#6E7F99;
+
+  /* monster green — the only action colour */
+  --green:#0F9D52;
+  --green-dk:#0B7D40;
+  --green-lt:#E9F7EF;
+  --green-ring:rgba(15,157,82,.28);
+
+  /* purple — brand accent, used sparingly */
+  --purple:#6B4DE6;
+  --purple-lt:#F0EDFD;
+
+  /* movement + state */
+  --up:#12803F;
+  --down:#C3372E;
+  --amber:#B26B00;
+  --amber-lt:#FDF3E2;
+
+  --shadow-sm:0 1px 2px rgba(11,27,51,.06);
+  --shadow:0 1px 3px rgba(11,27,51,.08), 0 8px 24px -18px rgba(11,27,51,.35);
+
+  --ui:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --txt:"Public Sans","Helvetica Neue",Arial,sans-serif;
+
+  /* the renderer overwrites this when a snapshot declares its provenance */
   --open-label:"First seen ";
-  --bg:#eef2f7;            /* page ground */
-  --card:#ffffff;          /* primary surface */
-  --card2:#f6f8fc;         /* recessed surface */
-  --card3:#eaeff6;         /* deepest light surface */
-  --line:#dbe3ee;          /* hairline */
-  --line2:#c3cfe0;         /* stronger divider */
-  --ink:#0b1b33;           /* headings, dark navy */
-  --ink2:#182c4a;          /* body text */
-  --muted:#56688a;         /* secondary text */
-  --faint:#7d8ca6;         /* tertiary text */
-  --green:#0f9d52;         /* Monster green — primary action */
-  --green-d:#0a7a3f;       /* pressed / text-on-white green */
-  --green-l:#e6f6ed;       /* green tint fill */
-  --purple:#6d3bea;        /* secondary brand accent, used sparingly */
-  --purple-l:#f0ebfe;
-  --amber:#b26a00;
-  --danger:#c2303f;
-  --field:#0b1b33;         /* stadium navy for the football visual */
-  --radius:14px;
-  --radius-s:10px;
-  --shadow:0 1px 2px rgba(11,27,51,.06),0 6px 18px rgba(11,27,51,.06);
-  --shadow-l:0 2px 4px rgba(11,27,51,.07),0 14px 40px rgba(11,27,51,.10);
-  --max:1280px;
 }
+
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink2);
-  font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-button{font:inherit}
-h1,h2,h3,h4{color:var(--ink);margin:0;letter-spacing:-.018em;line-height:1.2}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--grey); color:var(--navy);
+  font-family:var(--txt); font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4,.ui{font-family:var(--ui); letter-spacing:-.01em}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
 p{margin:0}
-.wrap{max-width:var(--max);margin:auto;padding:0 28px}
+a{color:inherit; text-decoration:none}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--green); outline-offset:2px; border-radius:3px}
+.wrap{max-width:1280px; margin:0 auto; padding-left:16px; padding-right:16px}
+.num{font-variant-numeric:tabular-nums}
+.hidden{display:none !important}
 
-/* ── Utility strip (verified-odds mode only) ───────────────────────────────*/
-.utility{background:var(--ink);color:#c9d6ea;font-size:12.5px;border-bottom:1px solid #16294a}
-.utility .wrap{height:34px;display:flex;align-items:center;gap:10px}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:7px}
+/* ── utility strip ─────────────────────────────────────────────────────── */
+.utility{background:var(--navy); color:#C9D6E8; font-size:12px}
+.utility .wrap{display:flex; align-items:center; gap:14px; min-height:30px; flex-wrap:wrap}
+.utility #globalStatus{display:inline-flex; align-items:center; gap:7px; font-family:var(--ui); font-weight:600; letter-spacing:.02em}
+.status-dot{width:7px; height:7px; border-radius:50%; background:#7E8FA8; display:inline-block; flex:none}
+[data-feed="live"] .status-dot{background:#3ED67F; box-shadow:0 0 0 3px rgba(62,214,127,.2)}
+[data-feed="delayed"] .status-dot{background:#E0A63A; box-shadow:0 0 0 3px rgba(224,166,58,.2)}
+.utility #globalTimestamp{color:#93A6BF; font-variant-numeric:tabular-nums}
+.utility .u-right{margin-left:auto; color:#8194AE}
 
-/* ── Top navigation ────────────────────────────────────────────────────────*/
-.topbar{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;
-  box-shadow:0 1px 0 rgba(11,27,51,.04)}
-.topbar .wrap{min-height:68px;display:flex;align-items:center;gap:28px}
-.brand{display:inline-flex;align-items:center;gap:9px;font-weight:900;font-size:18px;color:var(--ink);
-  letter-spacing:-.02em;white-space:nowrap}
-.brand b{color:var(--green-d)}
-.brand svg{display:block}
-.nav{display:flex;align-items:center;gap:4px;margin-right:auto;flex-wrap:wrap}
-.nav a{color:var(--muted);font-weight:700;font-size:14.5px;padding:9px 13px;border-radius:9px;white-space:nowrap}
-.nav a:hover{color:var(--ink);background:var(--card2)}
-.nav a.active{color:var(--ink);background:var(--green-l);box-shadow:inset 0 0 0 1px rgba(15,157,82,.22)}
-.nav-buy{display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:0 0 auto}
-.subscribe{background:var(--green);color:#fff;font-weight:800;font-size:14.5px;padding:11px 20px;border-radius:10px;
-  white-space:nowrap;text-align:center;box-shadow:0 1px 0 rgba(0,0,0,.06),0 6px 16px rgba(15,157,82,.28)}
-.subscribe:hover{background:var(--green-d)}
-.nav-fee{font-size:11px;font-weight:700;color:var(--faint);text-align:center;white-space:nowrap}
+/* ── sticky header ─────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky; top:0; z-index:60; background:var(--white);
+  border-bottom:1px solid var(--line); box-shadow:var(--shadow-sm);
+}
+.topbar .wrap{display:flex; align-items:center; gap:18px; min-height:56px}
+.brand{
+  display:inline-flex; align-items:center; gap:8px; flex:none;
+  font-family:var(--ui); font-weight:800; font-size:17px; letter-spacing:-.02em;
+  color:var(--navy);
+}
+.brand b{color:var(--green); font-weight:800}
+.nav{display:flex; align-items:center; gap:2px; overflow-x:auto; scrollbar-width:none; flex:1 1 auto}
+.nav::-webkit-scrollbar{display:none}
+.nav a{
+  font-family:var(--ui); font-weight:600; font-size:13.5px; color:var(--mid);
+  padding:8px 11px; border-radius:6px; white-space:nowrap; transition:background .12s, color .12s;
+}
+.nav a:hover{background:var(--grey-2); color:var(--navy)}
+.nav a.active{color:var(--navy); background:var(--grey-2)}
+.nav-buy{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex:none}
+.nav-buy .subscribe{
+  display:inline-flex; align-items:center; background:var(--green); color:#fff;
+  font-family:var(--ui); font-weight:700; font-size:13.5px; letter-spacing:-.01em;
+  padding:9px 15px; border-radius:6px; white-space:nowrap;
+  box-shadow:0 1px 0 rgba(11,27,51,.1); transition:background .12s;
+}
+.nav-buy .subscribe:hover{background:var(--green-dk)}
+.nav-fee{font-size:10.5px; color:var(--soft); white-space:nowrap}
 
-/* ── Hero: NFL identity ────────────────────────────────────────────────────*/
-.hero{padding:24px 0 20px}
-.hero-card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-l);
-  overflow:hidden;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr)}
-.hero-copy{padding:36px 40px 34px;min-width:0}
-.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:850;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--green-d);background:var(--green-l);border-radius:999px;padding:7px 14px;
-  margin-bottom:16px}
-.eyebrow .sep{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55}
-.hero h1{font-size:clamp(33px,3.7vw,46px);letter-spacing:-.032em;line-height:1.06;margin-bottom:16px}
-.hero-lede{font-size:17.5px;line-height:1.6;color:var(--ink2);max-width:56ch;margin-bottom:12px}
-.hero-lede b{color:var(--ink);font-weight:800}
-.hero-sub{font-size:15px;color:var(--muted);max-width:58ch;margin-bottom:22px}
-.hero-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.btn-primary{background:var(--green);color:#fff;font-weight:850;font-size:17px;padding:16px 30px;border-radius:12px;
-  display:inline-flex;align-items:center;gap:10px;box-shadow:0 2px 0 rgba(0,0,0,.05),0 10px 26px rgba(15,157,82,.3)}
-.btn-primary:hover{background:var(--green-d)}
-.btn-ghost{color:var(--ink);font-weight:800;font-size:15.5px;padding:15px 22px;border-radius:12px;
-  border:1.5px solid var(--line2);background:var(--card)}
-.btn-ghost:hover{border-color:var(--ink);background:var(--card2)}
-.hero-fee{margin-top:14px;font-size:13.5px;color:var(--muted);font-weight:600}
-.hero-marks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px;padding-top:18px;
-  border-top:1px solid var(--line)}
-.hero-mark{display:flex;flex-direction:column;gap:2px}
-.hero-mark b{font-size:15px;color:var(--ink);font-weight:850}
-.hero-mark small{font-size:12.5px;color:var(--faint);font-weight:650}
+/* ── slim season banner ────────────────────────────────────────────────── */
+.hero{background:var(--white); border-bottom:1px solid var(--line)}
+.hero .wrap{
+  display:flex; align-items:center; gap:20px 28px; flex-wrap:wrap;
+  padding-block:14px 15px;
+}
+.hero-left{display:flex; flex-direction:column; gap:5px; min-width:0; flex:1 1 420px}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--ui);
+  font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--green);
+}
+.eyebrow .pill{
+  background:var(--purple-lt); color:var(--purple); border-radius:3px;
+  padding:2px 6px; letter-spacing:.06em;
+}
+.hero h1{font-size:clamp(20px,2.4vw,26px); font-weight:700; line-height:1.15}
+.hero-lede{font-size:13.5px; color:var(--mid); max-width:62ch}
+.hero-right{display:flex; align-items:center; gap:14px; flex:none; flex-wrap:wrap}
+.hero-books{display:flex; align-items:center; gap:6px}
+.hero-books span{
+  font-family:var(--ui); font-size:11px; font-weight:700; color:var(--navy-2);
+  background:var(--grey-2); border:1px solid var(--line); border-radius:4px; padding:5px 9px;
+  letter-spacing:.01em;
+}
+.btn-primary{
+  display:inline-flex; align-items:center; background:var(--green); color:#fff;
+  font-family:var(--ui); font-weight:700; font-size:14px;
+  padding:11px 18px; border-radius:6px; white-space:nowrap; transition:background .12s;
+}
+.btn-primary:hover{background:var(--green-dk)}
+.btn-ghost{
+  display:inline-flex; align-items:center; border:1px solid var(--line-2); color:var(--navy);
+  font-family:var(--ui); font-weight:600; font-size:14px;
+  padding:10px 16px; border-radius:6px; background:var(--white); white-space:nowrap;
+}
+.btn-ghost:hover{background:var(--grey-2)}
+.hero-buy{display:flex; flex-direction:column; align-items:flex-start; gap:4px}
+.hero-fee{font-size:11px; color:var(--soft)}
 
-/* Neutral integration label — the only status the visitor sees while the
-   verified feed is pending. Deliberately small, grey and non-alarming. */
-.integration-note{display:none;align-items:center;gap:9px;margin-top:18px;padding:9px 15px;
-  border:1px solid var(--line2);background:var(--card2);border-radius:999px;color:var(--muted);
-  font-size:13px;font-weight:700;width:fit-content}
-.integration-note i{width:7px;height:7px;border-radius:50%;background:var(--purple);flex:0 0 auto}
-:root[data-feed="updating"] .integration-note{display:inline-flex}
+/* ── board shell ───────────────────────────────────────────────────────── */
+#odds{padding-top:16px; padding-bottom:8px}
 
-/* Football visual — original field / stadium-light artwork, no third-party marks. */
-.hero-art{position:relative;background:
-  radial-gradient(120% 90% at 50% -12%,rgba(120,170,255,.28) 0%,rgba(120,170,255,0) 62%),
-  linear-gradient(170deg,#16294a 0%,#0b1b33 55%,#081527 100%);
-  min-height:420px;overflow:hidden}
-.hero-art svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.art-caption{position:absolute;left:22px;top:20px;color:#dbe6f6;font-size:12.5px;font-weight:700;
-  letter-spacing:.03em;display:flex;align-items:center;gap:10px;z-index:2}
-.art-caption span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:999px;
-  padding:6px 12px;backdrop-filter:blur(4px)}
+.weeknav{margin-bottom:10px}
+.weeknav-card{
+  background:var(--white); border:1px solid var(--line); border-radius:8px;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  padding:9px 12px; box-shadow:var(--shadow-sm);
+}
+.wknav-l{display:flex; align-items:center; gap:8px; flex:none}
+.wk-nav{
+  width:30px; height:30px; border:1px solid var(--line-2); border-radius:6px;
+  background:var(--white); color:var(--navy-2); font-size:17px; line-height:1;
+  display:grid; place-items:center; transition:background .12s;
+}
+.wk-nav:hover:not(:disabled){background:var(--grey-2)}
+.wk-nav:disabled{opacity:.35; cursor:default}
+.wk{display:flex; flex-direction:column; min-width:128px}
+.wk-name{font-family:var(--ui); font-weight:700; font-size:15px; letter-spacing:-.01em}
+.wk-range{display:flex; gap:7px; font-size:11.5px; color:var(--soft); font-variant-numeric:tabular-nums}
+.wk-range b{font-weight:500; color:var(--mid)}
+.wk-range i{font-style:normal}
+.daystrip{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; flex:1 1 auto}
+.daystrip::-webkit-scrollbar{display:none}
+.day{
+  font-family:var(--ui); font-weight:600; font-size:12.5px; color:var(--mid);
+  border:1px solid var(--line); background:var(--white); border-radius:999px;
+  padding:6px 13px; white-space:nowrap; transition:.12s;
+}
+.day:hover{background:var(--grey-2)}
+.day.active{background:var(--navy); border-color:var(--navy); color:#fff}
 
-/* ── Week / date navigation ────────────────────────────────────────────────*/
-.weeknav{margin-bottom:26px}
-.weeknav-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
-  padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.wknav-l{display:flex;align-items:center;gap:12px}
-.wk-nav{width:38px;height:38px;border-radius:10px;border:1px solid var(--line2);background:var(--card2);
-  color:var(--ink);font-size:18px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
-.wk-nav:hover:not([disabled]){background:var(--card3);border-color:var(--ink)}
-.wk-nav[disabled]{opacity:.4;cursor:not-allowed}
-.wk{display:flex;flex-direction:column;min-width:172px}
-.wk-name{font-weight:900;font-size:17px;color:var(--ink);letter-spacing:-.02em}
-.wk-range{font-size:12.5px;color:var(--muted);display:flex;gap:6px;min-width:0;font-weight:650}
-.wk-range b,.wk-range i{font-style:normal;font-weight:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wk-range i{color:var(--faint)}
-.wk-range i:not(:empty)::before{content:"\00b7 ";margin-right:4px}
-.daystrip{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}
-.day{border:1px solid var(--line2);background:var(--card);border-radius:9px;padding:8px 14px;font-size:13px;
-  font-weight:750;color:var(--muted);cursor:pointer}
-.day:hover{border-color:var(--ink);color:var(--ink)}
-.day.active{border-color:var(--green);color:var(--green-d);background:var(--green-l)}
+/* feed status — an inline strip, never a full-page warning */
+.mast{margin-bottom:10px}
+.feed-state{
+  display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  border-radius:8px; padding:8px 12px; font-size:12.5px;
+  border:1px solid var(--line); background:var(--white);
+}
+.feed-state strong{font-family:var(--ui); font-weight:700; font-size:12.5px}
+.feed-state span{color:var(--mid); font-variant-numeric:tabular-nums}
+.feed-state::before{
+  content:""; width:7px; height:7px; border-radius:50%; background:var(--soft); flex:none;
+}
+.feed-state.updating{background:var(--amber-lt); border-color:#F0DDBC; color:#6B4A12}
+.feed-state.updating::before{background:var(--amber)}
+.feed-state.live{background:var(--green-lt); border-color:#CBEBD9; color:#0B5E33}
+.feed-state.live::before{background:var(--green)}
+.feed-state.delayed{background:var(--amber-lt); border-color:#F0DDBC; color:#6B4A12}
+.feed-state.delayed::before{background:var(--amber)}
 
-/* ── Section furniture ─────────────────────────────────────────────────────*/
-.section{padding:34px 0}
-.section-head{display:flex;justify-content:space-between;gap:22px;align-items:end;margin-bottom:20px}
-.section-head h2{font-size:27px}
-.section-head p{color:var(--muted);font-size:15.5px;margin-top:7px;max-width:70ch}
-.kicker{display:block;font-size:11.5px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--purple);margin-bottom:9px}
-.badge{border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:6px 13px;font-size:12px;
-  font-weight:800;color:var(--muted);white-space:nowrap}
+/* market tabs + filters */
+.controls{margin-bottom:10px}
+.marketbar{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  background:var(--white); border:1px solid var(--line); border-radius:8px;
+  padding:8px 10px; box-shadow:var(--shadow-sm);
+}
+.mkt-tabs{display:flex; background:var(--grey-2); border-radius:7px; padding:3px; gap:2px; flex:none}
+.mkt{
+  font-family:var(--ui); font-weight:700; font-size:13px; color:var(--mid);
+  padding:7px 16px; border-radius:5px; white-space:nowrap; transition:.12s;
+}
+.mkt:hover{color:var(--navy)}
+.mkt.active{background:var(--white); color:var(--navy); box-shadow:var(--shadow-sm)}
+.filters{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter{
+  font-family:var(--ui); font-weight:600; font-size:12px; color:var(--mid);
+  border:1px solid var(--line); border-radius:999px; padding:5px 12px; white-space:nowrap;
+  transition:.12s;
+}
+.filter:hover{background:var(--grey-2)}
+.filter.active{background:var(--green-lt); border-color:var(--green); color:var(--green-dk)}
 
-/* ── Research experience (shown while verified odds are pending) ───────────*/
-.research{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
-  overflow:hidden}
-.research-head{padding:28px 30px 24px;border-bottom:1px solid var(--line);background:
-  linear-gradient(180deg,var(--card) 0%,var(--card2) 100%)}
-.research-eyebrow{display:inline-block;color:var(--purple);font-size:11.5px;font-weight:850;letter-spacing:.14em;
-  text-transform:uppercase;margin-bottom:11px}
-.research-head h2{font-size:25px;margin-bottom:11px}
-.research-head p{color:var(--muted);max-width:70ch;font-size:15.5px}
-.research-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
-.rcard{background:var(--card);padding:26px 28px}
-.rcard:hover{background:var(--card2)}
-.rnum{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;
-  background:var(--green-l);color:var(--green-d);font-size:12.5px;font-weight:900;margin-bottom:13px}
-.rcard h3{margin-bottom:9px;font-size:17.5px}
-.rcard p{color:var(--muted);font-size:14.8px;line-height:1.65}
-.research-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 28px;
-  border-top:1px solid var(--line);background:var(--card2);flex-wrap:wrap}
-.research-foot-l strong{display:block;font-size:16.5px;color:var(--ink)}
-.research-foot-l small{display:block;color:var(--muted);font-size:13px;margin-top:3px}
-.research-cta{background:var(--green);color:#fff;border-radius:11px;padding:14px 26px;font-weight:850;font-size:15.5px;
-  white-space:nowrap;box-shadow:0 6px 18px rgba(15,157,82,.26)}
-.research-cta:hover{background:var(--green-d)}
+/* ── board + rail ──────────────────────────────────────────────────────── */
+.board-layout{display:grid; grid-template-columns:minmax(0,1fr) 296px; gap:14px; align-items:start}
 
-/* ── Capability cards (matchups, movement, players) ────────────────────────*/
-.cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.cap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;
-  box-shadow:var(--shadow)}
-.cap:hover{box-shadow:var(--shadow-l);border-color:var(--line2)}
-.cap .icn{width:42px;height:42px;border-radius:11px;background:var(--card2);border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.cap h3{font-size:18px;margin-bottom:9px}
-.cap p{color:var(--muted);font-size:14.8px;line-height:1.65}
-.cap ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.cap li{position:relative;padding-left:22px;font-size:14px;color:var(--ink2);font-weight:600}
-.cap li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:2px;
-  background:var(--green);opacity:.85}
+.board{
+  background:var(--white); border:1px solid var(--line); border-radius:8px;
+  overflow:hidden; box-shadow:var(--shadow-sm);
+}
+.board-title{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:11px 14px; border-bottom:1px solid var(--line); background:var(--white);
+}
+.board-title h2{font-size:16px; font-weight:700; margin-right:auto}
+.board-title>div{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+#boardTimestamp{font-size:11.5px; color:var(--soft); font-variant-numeric:tabular-nums}
+.fee-tag{font-size:10.5px; color:var(--soft)}
+.board-title a[data-product]{
+  background:var(--green); color:#fff; font-family:var(--ui); font-weight:700;
+  font-size:12.5px; padding:7px 13px; border-radius:6px; white-space:nowrap;
+}
+.board-title a[data-product]:hover{background:var(--green-dk)}
 
-/* ── Insights ──────────────────────────────────────────────────────────────*/
-.insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.insight{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;
-  box-shadow:var(--shadow)}
-.insight b{display:block;font-size:11.5px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;
-  color:var(--purple);margin-bottom:11px}
-.insight h3{font-size:18px;margin-bottom:9px}
-.insight p{color:var(--muted);font-size:14.8px;line-height:1.65}
+/* the 7-column grid the renderer fills: matchup | open | move | 3 books | cta */
+.columns,.game-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) 74px 68px repeat(3,minmax(0,1fr)) 112px;
+  gap:8px; align-items:center;
+}
+.columns{
+  padding:8px 14px; background:var(--grey-2); border-bottom:1px solid var(--line);
+  font-family:var(--ui); font-size:10.5px; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--soft);
+}
+.columns span:nth-child(n+4):nth-child(-n+6){text-align:center}
+.columns span:nth-child(2),.columns span:nth-child(3){text-align:center}
+.columns span:last-child{text-align:center}
 
-/* ── MonsterGPT explainer rail ─────────────────────────────────────────────*/
-.side{display:flex;flex-direction:column;gap:16px}
-.side-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;
-  box-shadow:var(--shadow)}
-.side-card h3{font-size:17px;margin-bottom:10px}
-.side-card p{color:var(--muted);font-size:14.5px;line-height:1.62}
-.fee-line{color:var(--faint);font-size:12.5px;font-weight:700;margin:12px 0 14px}
-.mini-cta{display:block;text-align:center;background:var(--green);color:#fff;border-radius:10px;padding:13px 18px;
-  font-weight:850;font-size:15px;box-shadow:0 5px 14px rgba(15,157,82,.24)}
-.mini-cta:hover{background:var(--green-d)}
-.legend{display:flex;flex-direction:column;gap:12px;margin-top:4px}
-.legend>div{display:flex;flex-direction:column;padding-left:14px;border-left:3px solid var(--green);border-radius:2px}
-.legend>div:last-child{border-left-color:var(--purple)}
-.legend span{font-weight:850;font-size:14.5px;color:var(--ink)}
-.legend small{color:var(--muted);font-size:13px}
-
-/* ── Odds board (revealed only when a verified snapshot arrives) ───────────*/
-.controls{border:1px solid var(--line);background:var(--card);border-radius:var(--radius);padding:14px 16px;
-  box-shadow:var(--shadow);margin-bottom:18px}
-.marketbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.mkt-tabs{display:flex;gap:4px;background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:4px}
-.mkt{background:none;border:0;color:var(--muted);font-weight:800;font-size:14px;padding:9px 18px;border-radius:8px;
-  cursor:pointer}
-.mkt.active{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(11,27,51,.12)}
-.filters{display:flex;gap:7px;flex-wrap:wrap}
-.filter{border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:8px 15px;font-size:13px;
-  font-weight:750;color:var(--muted);cursor:pointer}
-.filter.active{border-color:var(--green);color:var(--green-d);background:var(--green-l)}
-.board-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px}
-.board{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
-  overflow:hidden}
-.board-title{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;
-  border-bottom:1px solid var(--line);flex-wrap:wrap}
-.board-title h2{font-size:20px}
-.board-title>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.board-title a{background:var(--green);color:#fff;border-radius:9px;padding:9px 16px;font-weight:800;font-size:13.5px}
-.fee-tag{font-size:12px;color:var(--faint);font-weight:750;white-space:nowrap}
-.columns,.game-row{display:grid;grid-template-columns:minmax(212px,1.5fr) 74px 82px repeat(3,minmax(104px,1fr)) 116px;
-  gap:10px;align-items:center}
-.columns{padding:11px 22px;font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);
-  font-weight:850;border-bottom:1px solid var(--line);background:var(--card2)}
 .game{border-bottom:1px solid var(--line)}
-.game.hidden{display:none}
-.game-row{padding:14px 22px}
-.matchup .time{font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;
-  font-weight:750}
-.matchup .team{font-weight:850;font-size:15.5px;line-height:1.3;color:var(--ink)}
-.opn{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px;font-weight:750}
-.mv{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:850}
-.mv.up{color:var(--green-d)}.mv.down{color:var(--danger)}.mv.unchanged{color:var(--faint)}
-.bk{border:1px solid var(--line);background:var(--card2);border-radius:10px;padding:9px 8px;text-align:center}
-.bk .ln{font-weight:850;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
-.bk .pr{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;margin-top:2px}
-.bk.best{border-color:var(--green);background:var(--green-l);box-shadow:0 0 0 1px rgba(15,157,82,.28)}
-.bk.best .ln{color:var(--green-d)}
-.bk .badge{display:block;border:0;background:none;padding:0;font-size:9px;letter-spacing:.14em;color:var(--green-d);
-  font-weight:900;margin-top:3px}
-.bk.na{opacity:.45}
-.analyze{border:1px solid var(--line2);background:var(--card);color:var(--ink);border-radius:9px;padding:10px 8px;
-  font-weight:800;font-size:13px;cursor:pointer;width:100%}
-.analyze:hover{border-color:var(--green);color:var(--green-d)}
-.intel{display:none;padding:0 22px 18px;background:var(--card2)}
+.game:last-child{border-bottom:none}
+.game-row{padding:10px 14px; transition:background .1s}
+.game:hover .game-row{background:#FAFBFD}
+
+.matchup{display:flex; flex-direction:column; gap:1px; min-width:0}
+.matchup .time{
+  font-size:10.5px; color:var(--soft); font-family:var(--ui); font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+}
+.matchup .team{
+  font-family:var(--ui); font-weight:600; font-size:14px; color:var(--navy);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.opn{
+  text-align:center; font-size:13px; color:var(--mid); font-variant-numeric:tabular-nums;
+  font-family:var(--ui); font-weight:600;
+}
+.mv{
+  text-align:center; font-size:12.5px; font-weight:700; font-family:var(--ui);
+  font-variant-numeric:tabular-nums; color:var(--soft);
+}
+.mv.up{color:var(--up)}
+.mv.down{color:var(--down)}
+
+.bk{
+  position:relative; border:1px solid var(--line); border-radius:6px;
+  padding:7px 6px; text-align:center; background:var(--white); min-width:0;
+}
+.bk .ln{
+  font-family:var(--ui); font-weight:700; font-size:13.5px; color:var(--navy);
+  font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.bk .pr{font-size:11.5px; color:var(--mid); font-variant-numeric:tabular-nums; margin-top:1px}
+.bk.na{background:var(--grey-2); border-style:dashed}
+.bk.na .ln{color:var(--soft); font-weight:600}
+.bk.best{border-color:var(--green); background:var(--green-lt); box-shadow:0 0 0 1px var(--green-ring)}
+.bk.best .ln{color:var(--green-dk)}
+.bk .badge{
+  position:absolute; top:-7px; left:50%; transform:translateX(-50%);
+  background:var(--green); color:#fff; font-family:var(--ui); font-weight:800;
+  font-size:8.5px; letter-spacing:.09em; padding:2px 6px; border-radius:3px;
+}
+
+.analyze{
+  border:1px solid var(--line-2); background:var(--white); border-radius:6px;
+  font-family:var(--ui); font-weight:700; font-size:12px; color:var(--navy-2);
+  padding:8px 6px; width:100%; transition:.12s;
+}
+.analyze:hover{background:var(--purple-lt); border-color:var(--purple); color:var(--purple)}
+
+.intel{display:none; border-top:1px dashed var(--line); background:var(--grey)}
 .intel.open{display:block}
-.intel-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:16px}
-.intel h4{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);margin-bottom:6px}
-.intel p{color:var(--ink2);font-size:14px;line-height:1.6}
-.intel-cta{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;
-  border-top:1px solid var(--line);margin-top:4px;padding-top:14px}
-.intel-cta span{font-weight:850;font-size:14.5px;color:var(--ink)}
-.intel-cta small{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:2px}
-.intel-cta a{background:var(--green);color:#fff;border-radius:9px;padding:10px 20px;font-weight:850;font-size:13.5px;
-  white-space:nowrap}
-.unusual{display:inline-block;font-size:10px;font-weight:900;letter-spacing:.08em;color:var(--amber);
-  border:1px solid rgba(178,106,0,.35);background:#fdf6e8;border-radius:999px;padding:2px 8px;margin-left:8px}
-.empty-state{padding:56px 24px;text-align:center}
-.empty-state strong{display:block;font-size:19px;color:var(--ink);margin-bottom:8px}
-.empty-state p{color:var(--muted);margin:0 auto;max-width:46ch}
-.feed-state{display:flex;flex-direction:column;gap:2px}
-.feed-status strong{font-size:14px;color:var(--ink)}
-.feed-status span{font-size:12.5px;color:var(--muted)}
+.intel-inner{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px;
+  padding:13px 14px;
+}
+.intel-inner h4{
+  font-size:10.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--purple); margin-bottom:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
+.intel-inner p{font-size:12.5px; color:var(--mid)}
+.unusual{
+  background:var(--amber-lt); color:var(--amber); border:1px solid #F0DDBC;
+  border-radius:3px; padding:1px 5px; font-size:8.5px; letter-spacing:.08em;
+}
+.intel-cta{
+  grid-column:1/-1; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  border-top:1px solid var(--line); padding-top:11px;
+}
+.intel-cta>span{
+  font-family:var(--ui); font-weight:700; font-size:13px; display:flex;
+  flex-direction:column; margin-right:auto;
+}
+.intel-cta small{font-family:var(--txt); font-weight:400; font-size:10.5px; color:var(--soft)}
+.intel-cta a{
+  background:var(--green); color:#fff; font-family:var(--ui); font-weight:700;
+  font-size:12.5px; padding:7px 15px; border-radius:6px;
+}
+.intel-cta a:hover{background:var(--green-dk)}
 
-/* Line comparison table */
-.table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow)}
-table{width:100%;border-collapse:collapse;min-width:720px}
-th,td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line);font-size:14.5px}
-th{background:var(--card2);font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);
-  font-weight:850}
-td strong{color:var(--ink)}
-.best-cell{color:var(--green-d);font-weight:850}
-.sites{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.site-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;
-  box-shadow:var(--shadow)}
-.site-card strong{display:block;font-size:16px;color:var(--ink);margin-bottom:6px}
-.site-card span{color:var(--muted);font-size:13.5px}
+/* empty board — a tidy panel inside a complete interface, not a warning screen */
+.empty-state{
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  padding:40px 20px; text-align:center;
+}
+.empty-state strong{font-family:var(--ui); font-weight:700; font-size:14px; color:var(--navy-2)}
+.empty-state p{font-size:13px; color:var(--soft); max-width:46ch}
 
-/* ── Pricing ───────────────────────────────────────────────────────────────*/
-.pricing{padding:34px 0 44px}
-.fee-note{display:inline-block;margin:0 0 18px;padding:10px 16px;border:1px solid var(--line2);background:var(--card);
-  border-radius:10px;color:var(--ink2);font-weight:700;font-size:13.5px}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.plan{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;
-  box-shadow:var(--shadow);display:flex;flex-direction:column}
-.plan.featured{border:2px solid var(--green);box-shadow:0 2px 4px rgba(11,27,51,.06),0 16px 40px rgba(15,157,82,.14);
-  position:relative}
-.plan.featured::after{content:"MOST POPULAR";position:absolute;top:-11px;left:26px;background:var(--green);color:#fff;
-  font-size:10px;font-weight:900;letter-spacing:.12em;padding:4px 11px;border-radius:999px}
-.plan h3{font-size:17px;margin-bottom:10px}
-.price-big{font-size:40px;font-weight:900;color:var(--ink);letter-spacing:-.035em;line-height:1;margin-bottom:12px}
-.price-big span{font-size:16px;font-weight:750;color:var(--faint);letter-spacing:0}
-.plan p{color:var(--muted);font-size:14.5px;margin-bottom:22px}
-.plan a{margin-top:auto;display:block;text-align:center;border-radius:10px;padding:14px 18px;font-weight:850;
-  font-size:15px;background:var(--card2);color:var(--ink);border:1px solid var(--line2)}
-.plan a:hover{border-color:var(--ink)}
-.plan.featured a{background:var(--green);color:#fff;border-color:transparent;
-  box-shadow:0 6px 18px rgba(15,157,82,.26)}
-.plan.featured a:hover{background:var(--green-d)}
+/* rail */
+.side{display:flex; flex-direction:column; gap:12px; position:sticky; top:68px}
+.card{background:var(--white); border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow-sm)}
+.buy-card{padding:14px}
+.buy-card .k{
+  font-family:var(--ui); font-size:10.5px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--purple);
+}
+.buy-card h3{font-size:16px; font-weight:700; margin-top:5px}
+.buy-card .price{
+  font-family:var(--ui); font-weight:800; font-size:30px; letter-spacing:-.025em;
+  margin-top:9px; font-variant-numeric:tabular-nums; line-height:1;
+}
+.buy-card .price span{font-size:13px; font-weight:600; color:var(--soft); letter-spacing:0}
+.buy-card .fee{font-size:11px; color:var(--soft); margin-top:4px}
+.buy-card a[data-product]{
+  display:block; text-align:center; background:var(--green); color:#fff;
+  font-family:var(--ui); font-weight:700; font-size:14px;
+  padding:11px 14px; border-radius:6px; margin-top:11px;
+}
+.buy-card a[data-product]:hover{background:var(--green-dk)}
+.buy-card ul{list-style:none; margin:12px 0 0; padding:0; display:flex; flex-direction:column; gap:7px}
+.buy-card li{
+  font-size:12.5px; color:var(--mid); padding-left:19px; position:relative;
+}
+.buy-card li::before{
+  content:""; position:absolute; left:0; top:6px; width:11px; height:6px;
+  border-left:2px solid var(--green); border-bottom:2px solid var(--green);
+  transform:rotate(-45deg);
+}
+.rail-head{
+  padding:10px 13px; border-bottom:1px solid var(--line);
+  font-family:var(--ui); font-weight:700; font-size:12.5px;
+}
+.legend{padding:11px 13px; display:flex; flex-direction:column; gap:8px}
+.legend div{display:flex; align-items:baseline; gap:9px; font-size:12px; color:var(--mid)}
+.legend b{font-family:var(--ui); font-size:12px; flex:none; width:44px}
+.legend b.up{color:var(--up)} .legend b.down{color:var(--down)}
+.legend .chip{
+  flex:none; width:44px; text-align:center; font-family:var(--ui); font-weight:800;
+  font-size:8.5px; letter-spacing:.08em; background:var(--green); color:#fff;
+  border-radius:3px; padding:2px 0;
+}
+.prompts{padding:11px 13px; display:flex; flex-direction:column; gap:7px}
+.prompts p{
+  font-size:12.5px; color:var(--navy-2); background:var(--grey); border:1px solid var(--line);
+  border-left:2px solid var(--purple); border-radius:0 5px 5px 0; padding:7px 10px;
+}
 
-/* ── Footer ────────────────────────────────────────────────────────────────*/
-.disclaimer{background:var(--card);border-top:1px solid var(--line);padding:32px 0 100px;color:var(--muted);
-  font-size:13px;line-height:1.7}
-.disclaimer p{margin-bottom:10px;max-width:104ch}
-.disclaimer strong{color:var(--ink2)}
+/* ── content sections ──────────────────────────────────────────────────── */
+.section{padding-block:34px; border-top:1px solid var(--line); background:var(--white)}
+.section.alt{background:var(--grey)}
+.section-head{margin-bottom:18px; display:flex; flex-direction:column; gap:5px}
+.kicker{
+  font-family:var(--ui); font-size:10.5px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--green);
+}
+.section-head h2{font-size:clamp(19px,2.2vw,23px); font-weight:700}
+.section-head p{font-size:14px; color:var(--mid); max-width:70ch}
 
-/* ── Mobile sticky CTA ─────────────────────────────────────────────────────*/
-.sticky-cta{display:none}
-.fee-mini{color:var(--faint);font-weight:700;font-size:11px}
+.grid-3{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:12px}
+.tile{background:var(--white); border:1px solid var(--line); border-radius:8px; padding:15px}
+.section.alt .tile{background:var(--white)}
+.tile h3{font-size:14.5px; font-weight:700; margin-bottom:5px}
+.tile p{font-size:13px; color:var(--mid)}
+.tile .tag{
+  font-family:var(--ui); font-size:10px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--soft); display:block; margin-bottom:7px;
+}
 
-/* ── Feed state ────────────────────────────────────────────────────────────
-   <html> carries data-feed = updating | live | delayed. The markup ships as
-   "updating", so the research face renders before any script runs and the
-   board returns on its own the moment a verified snapshot sets
-   data-feed="live" — no deploy needed to switch over. Elements marked
-   .board-only belong to the odds board: present in the DOM (ids, columns and
-   the First seen -> Current header survive intact) but not rendered while
-   updating. Empty tables, disabled filters and the technical status box are
-   hidden with them, so nothing half-built reaches the visitor. */
-:root[data-feed="updating"] .board-only,
-:root[data-feed="updating"] .nav-board,
-:root[data-feed="updating"] .mast,
-:root[data-feed="updating"] .feed-status,
-:root[data-feed="updating"] .utility{display:none}
-:root[data-feed="live"] .research,
-:root[data-feed="delayed"] .research,
-:root[data-feed="live"] .research-only,
-:root[data-feed="delayed"] .research-only{display:none}
-/* Week navigation is chrome, not data: it stays in both faces. */
+/* research panel */
+.research{padding-block:34px; border-top:1px solid var(--line); background:var(--grey)}
+.research-grid{display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:16px; align-items:start}
+.research-cta{
+  background:var(--white); border:1px solid var(--line); border-radius:8px; padding:16px;
+  box-shadow:var(--shadow-sm);
+}
+.research-cta h3{font-size:16px; font-weight:700}
+.research-cta p{font-size:13px; color:var(--mid); margin-top:6px}
+.research-cta a[data-product]{
+  display:block; text-align:center; background:var(--green); color:#fff;
+  font-family:var(--ui); font-weight:700; font-size:14px;
+  padding:11px 14px; border-radius:6px; margin-top:12px;
+}
+.research-cta a[data-product]:hover{background:var(--green-dk)}
+.research-cta .fee{font-size:11px; color:var(--soft); margin-top:7px; text-align:center}
 
-/* ── Responsive ────────────────────────────────────────────────────────────*/
-@media(max-width:1180px){
-  .hero-card{grid-template-columns:1fr}
-  .hero-art{min-height:280px;order:-1}
-  .hero-copy{padding:36px 32px 32px}
+/* Sections that only make sense once a verified snapshot exists. The board
+   itself is NOT one of them: its shell stays on screen and shows an empty
+   panel, so a missing feed never turns the page into a warning screen. Only
+   the comparison table hides, because an empty table is just a broken table. */
+.board-only{display:none}
+[data-feed="live"] .board-only,
+[data-feed="delayed"] .board-only{display:block}
+
+/* comparison table */
+.comparison{padding-block:34px; border-top:1px solid var(--line); background:var(--white)}
+.table-shell{border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--white)}
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse; width:100%; min-width:660px; font-size:13px}
+thead th{
+  background:var(--grey-2); text-align:left; padding:9px 13px;
+  font-family:var(--ui); font-size:10.5px; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--soft); border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+tbody td{padding:9px 13px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; color:var(--mid)}
+tbody tr:last-child td{border-bottom:none}
+tbody td strong{font-family:var(--ui); font-weight:600; font-size:12.5px; color:var(--navy)}
+td.best-cell{background:var(--green-lt); color:var(--green-dk); font-weight:600}
+#comparisonStatus{font-size:11.5px; color:var(--soft); font-weight:400; text-transform:none; letter-spacing:0}
+
+/* pricing */
+.pricing{padding-block:38px; border-top:1px solid var(--line); background:var(--grey)}
+.pricing .section-head p{color:var(--mid)}
+.fee-note{font-size:12.5px; color:var(--soft); margin-bottom:14px}
+.plans{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px}
+.plan{
+  background:var(--white); border:1px solid var(--line); border-radius:8px; padding:18px;
+  display:flex; flex-direction:column; gap:7px;
+}
+.plan.featured{border:2px solid var(--green); box-shadow:0 0 0 4px var(--green-lt)}
+.plan h3{font-family:var(--ui); font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--soft)}
+.price-big{font-family:var(--ui); font-weight:800; font-size:34px; letter-spacing:-.03em; font-variant-numeric:tabular-nums; line-height:1}
+.price-big span{font-size:13px; font-weight:600; color:var(--soft); letter-spacing:0}
+.plan p{font-size:13px; color:var(--mid); flex:1 1 auto}
+.plan a[data-product]{
+  display:block; text-align:center; background:var(--green); color:#fff;
+  font-family:var(--ui); font-weight:700; font-size:14px; padding:11px 14px; border-radius:6px;
+}
+.plan a[data-product]:hover{background:var(--green-dk)}
+.plan:not(.featured) a[data-product]{background:var(--white); color:var(--green-dk); border:1px solid var(--green)}
+.plan:not(.featured) a[data-product]:hover{background:var(--green-lt)}
+
+/* footer */
+.disclaimer{background:var(--navy); color:#A9BAD1; padding-block:28px 90px; font-size:12px}
+.disclaimer .wrap{display:flex; flex-direction:column; gap:9px}
+.disclaimer p{max-width:100ch; line-height:1.6}
+.disclaimer strong{color:#E4EDF8; font-family:var(--ui); font-weight:600}
+
+/* mobile sticky buy bar */
+.sticky-cta{
+  position:fixed; left:0; right:0; bottom:0; z-index:70; display:none;
+  align-items:center; gap:12px; padding:9px 14px calc(9px + env(safe-area-inset-bottom));
+  background:var(--white); border-top:1px solid var(--line-2);
+  box-shadow:0 -2px 14px rgba(11,27,51,.12);
+}
+.sticky-cta>span{display:flex; flex-direction:column; font-family:var(--ui); font-weight:700; font-size:13px; min-width:0}
+.sticky-cta small{font-family:var(--txt); font-weight:400; font-size:10.5px; color:var(--soft)}
+.sticky-cta a[data-product]{
+  margin-left:auto; background:var(--green); color:#fff; font-family:var(--ui);
+  font-weight:700; font-size:14px; padding:10px 20px; border-radius:6px; white-space:nowrap;
+}
+
+/* ── responsive ────────────────────────────────────────────────────────── */
+@media (max-width:1080px){
   .board-layout{grid-template-columns:1fr}
-  .side{display:grid;grid-template-columns:1fr 1fr}
-}
-@media(max-width:1000px){
-  .nav a:nth-child(n+4){display:none}
-  .cap-grid,.insights-grid,.plans{grid-template-columns:1fr}
-  .sites{grid-template-columns:1fr}
+  .side{position:static; flex-direction:row; flex-wrap:wrap}
+  .side>*{flex:1 1 260px}
   .research-grid{grid-template-columns:1fr}
-  .intel-inner{grid-template-columns:1fr}
-  .columns{display:none}
-  .game-row{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto auto;gap:9px;padding:14px 16px;
-    align-items:stretch}
-  .matchup{grid-column:1/-1;grid-row:1;border-bottom:1px solid var(--line);padding-bottom:9px}
-  .opn{grid-column:1;grid-row:2;align-self:center}
-  .mv{grid-column:2;grid-row:2;align-self:center;text-align:center}
-  .analyze{grid-column:3;grid-row:2}
-  .bk{grid-row:3}
-  .opn::before{content:var(--open-label,"First seen ");color:var(--faint);font-size:11px;font-weight:700}
-  .mv::before{content:"Move ";color:var(--faint);font-size:11px;font-weight:700}
-  .bk::before{content:attr(data-book);display:block;color:var(--faint);font-size:9px;text-transform:uppercase;
-    letter-spacing:.07em;margin-bottom:3px;font-weight:850}
+  .columns,.game-row{grid-template-columns:minmax(0,1.5fr) 62px 58px repeat(3,minmax(0,1fr)) 96px}
 }
-@media(max-width:760px){
-  .wrap{padding:0 16px}
-  /* On a handset the header is just the wordmark: the $27 CTA lives in the
-     sticky bar, which is on screen at every scroll position and carries the
-     5% fee line with it. Two competing green buttons in one viewport would
-     only split the tap. */
-  .topbar .wrap{min-height:56px;gap:10px;padding-top:6px;padding-bottom:6px;flex-wrap:nowrap}
-  .nav{display:none}
-  .nav-buy{display:none}
-  .brand{font-size:16.5px;gap:7px}
-  .brand svg{width:19px;height:19px}
-  .eyebrow .tail{display:none}
-  .eyebrow{font-size:11.5px;padding:6px 13px;margin-bottom:14px}
-  .hero-marks{grid-template-columns:1fr 1fr;gap:12px}
-  .art-caption{left:16px;top:14px;font-size:11.5px}
-  .hero{padding:20px 0 18px}
-  .hero-card{border-radius:16px}
-  .hero-copy{padding:26px 20px 28px}
-  .hero h1{font-size:28px}
-  .hero-lede{font-size:15.8px;line-height:1.55}
-  .hero-sub{font-size:14px;margin-bottom:18px}
-  .hero-art{min-height:176px}
-  .hero-cta{flex-direction:column;align-items:stretch}
-  .btn-primary,.btn-ghost{justify-content:center;text-align:center;width:100%}
-  .hero-marks{gap:14px}
-  .weeknav-card{gap:12px;padding:12px 14px}
-  .wk{min-width:0;flex:1}
-  .daystrip{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;
-    -webkit-overflow-scrolling:touch}
-  .section{padding:24px 0}
-  .section-head{flex-direction:column;align-items:flex-start;gap:8px}
-  .section-head h2{font-size:23px}
-  .research-head{padding:22px 20px 20px}
-  .research-head h2{font-size:21px}
-  .rcard{padding:20px}
-  .research-foot{padding:18px 20px}
-  .side{grid-template-columns:1fr}
-  .cap,.insight,.plan{padding:22px 20px}
-  .price-big{font-size:34px}
-  .intel-cta{flex-direction:column;align-items:stretch;gap:10px}
-  .intel-cta a{text-align:center}
-  .board-title{padding:16px}
-  .disclaimer{padding-bottom:124px}
-  /* Sticky conversion bar — the CTA follows the visitor down the page. */
-  .sticky-cta{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;
-    justify-content:space-between;gap:12px;padding:10px 16px;background:var(--card);
-    border-top:1px solid var(--line2);box-shadow:0 -6px 24px rgba(11,27,51,.12)}
-  .sticky-cta>span{display:flex;flex-direction:column;font-weight:850;font-size:14px;color:var(--ink);line-height:1.25}
-  .sticky-cta small{font-weight:700;font-size:11px;color:var(--muted)}
-  .sticky-cta a{background:var(--green);color:#fff;border-radius:10px;padding:12px 18px;font-weight:850;
-    font-size:14.5px;white-space:nowrap}
+@media (max-width:860px){
+  /* Two compact rows — brand + buy, then a scrolling nav — instead of three
+     tall ones. Every pixel here is a pixel of odds board pushed off screen. */
+  .topbar .wrap{flex-wrap:wrap; padding-top:7px; padding-bottom:0; min-height:0; gap:8px}
+  .nav{order:3; flex-basis:100%; border-top:1px solid var(--line); padding:3px 0}
+  .nav a{padding:7px 10px; font-size:13px}
+  .nav-buy{margin-left:auto; flex-direction:row; align-items:center; gap:8px}
+  .nav-buy .subscribe{font-size:12px; padding:7px 11px}
+  .nav-fee{font-size:10px}
+  .utility .wrap{min-height:26px}
 }
+@media (max-width:800px){
+  body{font-size:14.5px}
+  .sticky-cta{display:flex}
+  .disclaimer{padding-bottom:96px}
 
-/* ── Touch targets ─────────────────────────────────────────────────────────
-   Every tappable control clears 44x44 CSS px on a handset, per WCAG 2.2
-   Target Size (Minimum). Placed last so it wins over the compact mobile
-   paddings above; only the hit box grows, the type scale is untouched. */
-@media(max-width:760px){
-  .subscribe,.mini-cta,.plan a,.sticky-cta a,.board-title a,.intel-cta a,.research-cta,.btn-primary,.btn-ghost{
-    display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box}
-  .mini-cta,.plan a,.research-cta,.btn-primary,.btn-ghost{display:flex;width:100%}
-  .wk-nav{width:44px;height:44px;font-size:19px}
-  .mkt,.filter,.analyze,.day{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
-  .filter,.day{padding:0 18px;flex:0 0 auto}
-  .mkt{flex:0 0 auto;padding:0 16px}
-  .brand{min-height:44px;display:inline-flex;align-items:center}
-  .nav a{min-height:44px;display:inline-flex;align-items:center}
+  /* Slim the banner hard: on a phone it is a label for the board below it,
+     not a sales panel. The buy action stays, at button size rather than
+     billboard size, and the sticky bar carries it the rest of the way down. */
+  .hero .wrap{padding-block:10px 11px; gap:9px 16px}
+  .hero h1{font-size:19px}
+  .hero-lede{font-size:12.5px; line-height:1.42}
+  .hero-right{width:100%; gap:9px}
+  .hero-buy{flex-direction:row; align-items:center; gap:10px; flex-wrap:wrap}
+  .hero-fee{font-size:10.5px; flex:1 1 130px}
+  .btn-primary{font-size:12.5px; padding:8px 13px}
+
+  #odds{padding-top:10px}
+  .weeknav{margin-bottom:8px}
+  .weeknav-card{padding:7px 9px; gap:8px}
+  .wk-name{font-size:14px}
+  .day{padding:5px 11px; font-size:12px}
+  .mast{margin-bottom:8px}
+  .feed-state{padding:7px 11px}
+  .controls{margin-bottom:8px}
+  .marketbar{padding:6px 7px; gap:7px}
+  .mkt{padding:6px 12px; font-size:12.5px}
+  .filter{padding:4px 11px}
+
+  /* board header in two rows: title + action, then the small print */
+  .board-title{padding:9px 12px; gap:7px 10px}
+  .board-title h2{font-size:15px}
+  .board-title>div{width:100%; gap:8px}
+  .board-title a[data-product]{margin-left:auto; font-size:12px; padding:6px 12px}
+
+  /* board rows restack: matchup, then the three books, then open/move/CTA */
+  .columns{display:none}
+  .game-row{grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; padding:11px 12px}
+  .game-row>*:nth-child(1){grid-column:1/-1; grid-row:1}
+  .game-row>*:nth-child(4){grid-column:1; grid-row:2}
+  .game-row>*:nth-child(5){grid-column:2; grid-row:2}
+  .game-row>*:nth-child(6){grid-column:3; grid-row:2}
+  .game-row>*:nth-child(2){grid-column:1; grid-row:3}
+  .game-row>*:nth-child(3){grid-column:2; grid-row:3}
+  .game-row>*:nth-child(7){grid-column:3; grid-row:3}
+
+  /* the column header is gone, so each cell names itself */
+  .bk::after{
+    content:attr(data-book); display:block; margin-top:3px;
+    font-family:var(--ui); font-size:8.5px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--soft);
+  }
+  .bk.best::after{color:var(--green-dk)}
+  .opn::before,.mv::before{
+    display:block; font-family:var(--ui); font-size:8.5px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--soft);
+  }
+  .opn::before{content:var(--open-label)}
+  .mv::before{content:"Move"}
+  .opn,.mv{
+    border:1px solid var(--line); border-radius:6px; padding:7px 4px; background:var(--grey-2);
+  }
+  .analyze{height:100%}
+}
+@media (max-width:520px){
+  .hero-books{display:none}
+  .utility #globalTimestamp{display:none}
+  .board-title h2{font-size:15px}
+  .board-title .fee-tag{order:3; flex-basis:100%}
+  .board-title #boardTimestamp{font-size:11px}
+  .wk{min-width:0}
+  .price-big{font-size:30px}
+  .section,.research,.comparison,.pricing{padding-block:26px}
+}
+/* Nothing to report yet — do not leave a lone status dot floating in the bar. */
+[data-feed="updating"] .status-dot{display:none}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important}
 }
 </style>
 </head>
 <body>
-<div class="utility"><div class="wrap"><span id="globalStatus"><i class="status-dot"></i></span><span id="globalTimestamp"></span></div></div>
+<div class="utility"><div class="wrap"><span id="globalStatus"><i class="status-dot"></i></span><span id="globalTimestamp"></span><span class="u-right">Research only · 18+</span></div></div>
 
 <header class="topbar"><div class="wrap">
 <a class="brand" href="#top"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="10.4" ry="6.4" transform="rotate(-32 12 12)" fill="#0f9d52"/><path d="M6.6 17.4 17.4 6.6M9.6 11.2l3.2 3.2M11.2 9.6l3.2 3.2M12.8 8l3.2 3.2M8 12.8l3.2 3.2" stroke="#fff" stroke-width="1.35" stroke-linecap="round" fill="none"/></svg>MONSTER<b>.BET</b></a>
 <nav class="nav" aria-label="Primary">
 <a class="active" href="#odds">NFL Odds</a>
-<a href="#line-movement">Line Movement</a>
 <a href="#matchups">Matchups</a>
+<a href="#line-movement">Line Movement</a>
 <a href="#insights">Insights</a>
 <a href="#monster">MonsterGPT</a>
 <a class="nav-board" href="#comparison">Sportsbooks</a>
@@ -466,421 +640,20 @@ td strong{color:var(--ink)}
 
 <main id="top">
 
-<section class="hero"><div class="wrap"><div class="hero-card">
-<div class="hero-copy">
-<span class="eyebrow"><span>NFL</span><i class="sep"></i><span>Week 1</span><i class="sep tail"></i><span class="tail">Odds &amp; Intelligence</span></span>
-<h1>NFL Week 1 Odds &amp; Intelligence</h1>
-<p class="hero-lede"><b>MonsterGPT is an NFL research co-pilot.</b> Ask how a matchup collides, what an injury designation does to a game plan, how a player's role changes shape, and what a line move is actually telling you.</p>
-<p class="hero-sub">It keeps a week of football reasoning in one place. It does not accept or place wagers, and it does not sell picks.</p>
-<div class="hero-cta">
+<section class="hero"><div class="wrap">
+<div class="hero-left">
+<span class="eyebrow">NFL 2026 · Regular season <i class="pill">MonsterGPT</i></span>
+<h1>NFL Odds &amp; Line Movement</h1>
+<p class="hero-lede">Spreads, moneylines and totals compared across FanDuel, DraftKings and BetMGM — with first-seen versus current pricing, and MonsterGPT research attached to every matchup.</p>
+</div>
+<div class="hero-right">
+<div class="hero-books"><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span></div>
+<div class="hero-buy">
 <a class="btn-primary" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
-<a class="btn-ghost" href="#matchups">See what it researches</a>
-</div>
-<p class="hero-fee">Whop applies a 5% service fee at checkout.</p>
-<div class="integration-note"><i></i>Live odds integration in progress</div>
-<div class="hero-marks">
-<div class="hero-mark"><b>Matchup research</b><small>Pace, personnel, pressure</small></div>
-<div class="hero-mark"><b>Injury context</b><small>Who absorbs the snaps</small></div>
-<div class="hero-mark"><b>Player research</b><small>Usage and role shape</small></div>
-<div class="hero-mark"><b>Market movement</b><small>Opened vs. where it sits</small></div>
+<span class="hero-fee">Whop applies a 5% service fee at checkout.</span>
 </div>
 </div>
-<div class="hero-art" aria-hidden="true">
-<svg viewBox="0 0 600 470" preserveAspectRatio="xMidYMid slice" role="presentation">
-<defs>
-<linearGradient id="turf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0e7440"/><stop offset="1" stop-color="#0a3d27"/></linearGradient>
-<linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5e7ff" stop-opacity=".30"/><stop offset="1" stop-color="#d5e7ff" stop-opacity="0"/></linearGradient>
-<radialGradient id="bulb"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset="1" stop-color="#cfe4ff" stop-opacity="0"/></radialGradient>
-<linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1b33" stop-opacity=".82"/><stop offset="1" stop-color="#0b1b33" stop-opacity=".68"/></linearGradient>
-</defs>
-<!-- stadium light banks -->
-<polygon points="168,96 202,96 300,470 30,470" fill="url(#beam)"/>
-<polygon points="398,96 432,96 570,470 300,470" fill="url(#beam)"/>
-<circle cx="185" cy="96" r="40" fill="url(#bulb)"/><circle cx="415" cy="96" r="40" fill="url(#bulb)"/>
-<g fill="#e2ecfa" fill-opacity=".8">
-<rect x="159" y="82" width="52" height="9" rx="3"/><rect x="168" y="91" width="34" height="5" rx="2"/><rect x="182" y="64" width="6" height="19" rx="2" fill-opacity=".5"/>
-<rect x="389" y="82" width="52" height="9" rx="3"/><rect x="398" y="91" width="34" height="5" rx="2"/><rect x="412" y="64" width="6" height="19" rx="2" fill-opacity=".5"/>
-</g>
-<!-- stands -->
-<rect x="0" y="126" width="600" height="36" fill="#0a1729"/>
-<g fill="#8fa8c9" fill-opacity=".34">
-<circle cx="5" cy="132" r="2.10"/>
-<circle cx="16" cy="132" r="2.10"/>
-<circle cx="25" cy="132" r="2.10"/>
-<circle cx="35" cy="132" r="2.10"/>
-<circle cx="46" cy="132" r="2.10"/>
-<circle cx="56" cy="132" r="2.10"/>
-<circle cx="63" cy="132" r="2.10"/>
-<circle cx="73" cy="132" r="2.10"/>
-<circle cx="86" cy="132" r="2.10"/>
-<circle cx="95" cy="132" r="2.10"/>
-<circle cx="106" cy="132" r="2.10"/>
-<circle cx="113" cy="132" r="2.10"/>
-<circle cx="122" cy="132" r="2.10"/>
-<circle cx="135" cy="132" r="2.10"/>
-<circle cx="144" cy="132" r="2.10"/>
-<circle cx="153" cy="132" r="2.10"/>
-<circle cx="162" cy="132" r="2.10"/>
-<circle cx="176" cy="132" r="2.10"/>
-<circle cx="182" cy="132" r="2.10"/>
-<circle cx="196" cy="132" r="2.10"/>
-<circle cx="205" cy="132" r="2.10"/>
-<circle cx="215" cy="132" r="2.10"/>
-<circle cx="226" cy="132" r="2.10"/>
-<circle cx="233" cy="132" r="2.10"/>
-<circle cx="246" cy="132" r="2.10"/>
-<circle cx="252" cy="132" r="2.10"/>
-<circle cx="266" cy="132" r="2.10"/>
-<circle cx="272" cy="132" r="2.10"/>
-<circle cx="282" cy="132" r="2.10"/>
-<circle cx="292" cy="132" r="2.10"/>
-<circle cx="303" cy="132" r="2.10"/>
-<circle cx="313" cy="132" r="2.10"/>
-<circle cx="326" cy="132" r="2.10"/>
-<circle cx="332" cy="132" r="2.10"/>
-<circle cx="345" cy="132" r="2.10"/>
-<circle cx="354" cy="132" r="2.10"/>
-<circle cx="365" cy="132" r="2.10"/>
-<circle cx="376" cy="132" r="2.10"/>
-<circle cx="383" cy="132" r="2.10"/>
-<circle cx="396" cy="132" r="2.10"/>
-<circle cx="403" cy="132" r="2.10"/>
-<circle cx="414" cy="132" r="2.10"/>
-<circle cx="425" cy="132" r="2.10"/>
-<circle cx="432" cy="132" r="2.10"/>
-<circle cx="442" cy="132" r="2.10"/>
-<circle cx="455" cy="132" r="2.10"/>
-<circle cx="464" cy="132" r="2.10"/>
-<circle cx="475" cy="132" r="2.10"/>
-<circle cx="486" cy="132" r="2.10"/>
-<circle cx="492" cy="132" r="2.10"/>
-<circle cx="504" cy="132" r="2.10"/>
-<circle cx="514" cy="132" r="2.10"/>
-<circle cx="523" cy="132" r="2.10"/>
-<circle cx="536" cy="132" r="2.10"/>
-<circle cx="544" cy="132" r="2.10"/>
-<circle cx="552" cy="132" r="2.10"/>
-<circle cx="562" cy="132" r="2.10"/>
-<circle cx="576" cy="132" r="2.10"/>
-<circle cx="582" cy="132" r="2.10"/>
-<circle cx="595" cy="132" r="2.10"/>
-<circle cx="6" cy="140" r="1.88"/>
-<circle cx="18" cy="140" r="1.88"/>
-<circle cx="29" cy="140" r="1.88"/>
-<circle cx="36" cy="140" r="1.88"/>
-<circle cx="46" cy="140" r="1.88"/>
-<circle cx="56" cy="140" r="1.88"/>
-<circle cx="67" cy="140" r="1.88"/>
-<circle cx="77" cy="140" r="1.88"/>
-<circle cx="86" cy="140" r="1.88"/>
-<circle cx="99" cy="140" r="1.88"/>
-<circle cx="109" cy="140" r="1.88"/>
-<circle cx="119" cy="140" r="1.88"/>
-<circle cx="129" cy="140" r="1.88"/>
-<circle cx="136" cy="140" r="1.88"/>
-<circle cx="150" cy="140" r="1.88"/>
-<circle cx="157" cy="140" r="1.88"/>
-<circle cx="168" cy="140" r="1.88"/>
-<circle cx="178" cy="140" r="1.88"/>
-<circle cx="186" cy="140" r="1.88"/>
-<circle cx="198" cy="140" r="1.88"/>
-<circle cx="208" cy="140" r="1.88"/>
-<circle cx="216" cy="140" r="1.88"/>
-<circle cx="229" cy="140" r="1.88"/>
-<circle cx="236" cy="140" r="1.88"/>
-<circle cx="247" cy="140" r="1.88"/>
-<circle cx="257" cy="140" r="1.88"/>
-<circle cx="266" cy="140" r="1.88"/>
-<circle cx="276" cy="140" r="1.88"/>
-<circle cx="286" cy="140" r="1.88"/>
-<circle cx="299" cy="140" r="1.88"/>
-<circle cx="309" cy="140" r="1.88"/>
-<circle cx="317" cy="140" r="1.88"/>
-<circle cx="330" cy="140" r="1.88"/>
-<circle cx="337" cy="140" r="1.88"/>
-<circle cx="349" cy="140" r="1.88"/>
-<circle cx="360" cy="140" r="1.88"/>
-<circle cx="367" cy="140" r="1.88"/>
-<circle cx="377" cy="140" r="1.88"/>
-<circle cx="389" cy="140" r="1.88"/>
-<circle cx="399" cy="140" r="1.88"/>
-<circle cx="406" cy="140" r="1.88"/>
-<circle cx="419" cy="140" r="1.88"/>
-<circle cx="429" cy="140" r="1.88"/>
-<circle cx="437" cy="140" r="1.88"/>
-<circle cx="446" cy="140" r="1.88"/>
-<circle cx="458" cy="140" r="1.88"/>
-<circle cx="470" cy="140" r="1.88"/>
-<circle cx="478" cy="140" r="1.88"/>
-<circle cx="486" cy="140" r="1.88"/>
-<circle cx="497" cy="140" r="1.88"/>
-<circle cx="507" cy="140" r="1.88"/>
-<circle cx="519" cy="140" r="1.88"/>
-<circle cx="530" cy="140" r="1.88"/>
-<circle cx="540" cy="140" r="1.88"/>
-<circle cx="546" cy="140" r="1.88"/>
-<circle cx="556" cy="140" r="1.88"/>
-<circle cx="567" cy="140" r="1.88"/>
-<circle cx="577" cy="140" r="1.88"/>
-<circle cx="589" cy="140" r="1.88"/>
-<circle cx="598" cy="140" r="1.88"/>
-<circle cx="2" cy="148" r="1.66"/>
-<circle cx="16" cy="148" r="1.66"/>
-<circle cx="24" cy="148" r="1.66"/>
-<circle cx="34" cy="148" r="1.66"/>
-<circle cx="45" cy="148" r="1.66"/>
-<circle cx="52" cy="148" r="1.66"/>
-<circle cx="62" cy="148" r="1.66"/>
-<circle cx="72" cy="148" r="1.66"/>
-<circle cx="83" cy="148" r="1.66"/>
-<circle cx="96" cy="148" r="1.66"/>
-<circle cx="103" cy="148" r="1.66"/>
-<circle cx="112" cy="148" r="1.66"/>
-<circle cx="126" cy="148" r="1.66"/>
-<circle cx="134" cy="148" r="1.66"/>
-<circle cx="144" cy="148" r="1.66"/>
-<circle cx="156" cy="148" r="1.66"/>
-<circle cx="165" cy="148" r="1.66"/>
-<circle cx="173" cy="148" r="1.66"/>
-<circle cx="186" cy="148" r="1.66"/>
-<circle cx="195" cy="148" r="1.66"/>
-<circle cx="206" cy="148" r="1.66"/>
-<circle cx="213" cy="148" r="1.66"/>
-<circle cx="225" cy="148" r="1.66"/>
-<circle cx="233" cy="148" r="1.66"/>
-<circle cx="243" cy="148" r="1.66"/>
-<circle cx="254" cy="148" r="1.66"/>
-<circle cx="263" cy="148" r="1.66"/>
-<circle cx="276" cy="148" r="1.66"/>
-<circle cx="283" cy="148" r="1.66"/>
-<circle cx="293" cy="148" r="1.66"/>
-<circle cx="303" cy="148" r="1.66"/>
-<circle cx="316" cy="148" r="1.66"/>
-<circle cx="323" cy="148" r="1.66"/>
-<circle cx="335" cy="148" r="1.66"/>
-<circle cx="345" cy="148" r="1.66"/>
-<circle cx="356" cy="148" r="1.66"/>
-<circle cx="362" cy="148" r="1.66"/>
-<circle cx="375" cy="148" r="1.66"/>
-<circle cx="382" cy="148" r="1.66"/>
-<circle cx="392" cy="148" r="1.66"/>
-<circle cx="402" cy="148" r="1.66"/>
-<circle cx="412" cy="148" r="1.66"/>
-<circle cx="426" cy="148" r="1.66"/>
-<circle cx="434" cy="148" r="1.66"/>
-<circle cx="443" cy="148" r="1.66"/>
-<circle cx="455" cy="148" r="1.66"/>
-<circle cx="464" cy="148" r="1.66"/>
-<circle cx="475" cy="148" r="1.66"/>
-<circle cx="486" cy="148" r="1.66"/>
-<circle cx="495" cy="148" r="1.66"/>
-<circle cx="504" cy="148" r="1.66"/>
-<circle cx="516" cy="148" r="1.66"/>
-<circle cx="523" cy="148" r="1.66"/>
-<circle cx="532" cy="148" r="1.66"/>
-<circle cx="543" cy="148" r="1.66"/>
-<circle cx="553" cy="148" r="1.66"/>
-<circle cx="565" cy="148" r="1.66"/>
-<circle cx="576" cy="148" r="1.66"/>
-<circle cx="586" cy="148" r="1.66"/>
-<circle cx="596" cy="148" r="1.66"/>
-<circle cx="6" cy="156" r="1.44"/>
-<circle cx="18" cy="156" r="1.44"/>
-<circle cx="27" cy="156" r="1.44"/>
-<circle cx="37" cy="156" r="1.44"/>
-<circle cx="46" cy="156" r="1.44"/>
-<circle cx="56" cy="156" r="1.44"/>
-<circle cx="68" cy="156" r="1.44"/>
-<circle cx="79" cy="156" r="1.44"/>
-<circle cx="89" cy="156" r="1.44"/>
-<circle cx="97" cy="156" r="1.44"/>
-<circle cx="106" cy="156" r="1.44"/>
-<circle cx="116" cy="156" r="1.44"/>
-<circle cx="127" cy="156" r="1.44"/>
-<circle cx="138" cy="156" r="1.44"/>
-<circle cx="148" cy="156" r="1.44"/>
-<circle cx="160" cy="156" r="1.44"/>
-<circle cx="170" cy="156" r="1.44"/>
-<circle cx="177" cy="156" r="1.44"/>
-<circle cx="186" cy="156" r="1.44"/>
-<circle cx="198" cy="156" r="1.44"/>
-<circle cx="207" cy="156" r="1.44"/>
-<circle cx="219" cy="156" r="1.44"/>
-<circle cx="228" cy="156" r="1.44"/>
-<circle cx="240" cy="156" r="1.44"/>
-<circle cx="250" cy="156" r="1.44"/>
-<circle cx="257" cy="156" r="1.44"/>
-<circle cx="270" cy="156" r="1.44"/>
-<circle cx="276" cy="156" r="1.44"/>
-<circle cx="286" cy="156" r="1.44"/>
-<circle cx="299" cy="156" r="1.44"/>
-<circle cx="308" cy="156" r="1.44"/>
-<circle cx="318" cy="156" r="1.44"/>
-<circle cx="326" cy="156" r="1.44"/>
-<circle cx="336" cy="156" r="1.44"/>
-<circle cx="350" cy="156" r="1.44"/>
-<circle cx="356" cy="156" r="1.44"/>
-<circle cx="369" cy="156" r="1.44"/>
-<circle cx="376" cy="156" r="1.44"/>
-<circle cx="388" cy="156" r="1.44"/>
-<circle cx="398" cy="156" r="1.44"/>
-<circle cx="407" cy="156" r="1.44"/>
-<circle cx="416" cy="156" r="1.44"/>
-<circle cx="426" cy="156" r="1.44"/>
-<circle cx="439" cy="156" r="1.44"/>
-<circle cx="450" cy="156" r="1.44"/>
-<circle cx="458" cy="156" r="1.44"/>
-<circle cx="466" cy="156" r="1.44"/>
-<circle cx="477" cy="156" r="1.44"/>
-<circle cx="488" cy="156" r="1.44"/>
-<circle cx="498" cy="156" r="1.44"/>
-<circle cx="506" cy="156" r="1.44"/>
-<circle cx="519" cy="156" r="1.44"/>
-<circle cx="526" cy="156" r="1.44"/>
-<circle cx="539" cy="156" r="1.44"/>
-<circle cx="546" cy="156" r="1.44"/>
-<circle cx="559" cy="156" r="1.44"/>
-<circle cx="570" cy="156" r="1.44"/>
-<circle cx="576" cy="156" r="1.44"/>
-<circle cx="590" cy="156" r="1.44"/>
-<circle cx="599" cy="156" r="1.44"/>
-</g>
-<rect x="0" y="158" width="600" height="5" fill="#061020"/>
-<!-- turf -->
-<polygon points="-30,480 630,480 405,160 195,160" fill="url(#turf)"/>
-<g stroke="#ffffff" fill="none" stroke-linecap="round">
-<line x1="-30.0" y1="480.0" x2="630.0" y2="480.0" stroke-opacity="0.70" stroke-width="2.50"/>
-<line x1="31.0" y1="393.2" x2="569.0" y2="393.2" stroke-opacity="0.67" stroke-width="2.34"/>
-<line x1="72.6" y1="334.1" x2="527.4" y2="334.1" stroke-opacity="0.64" stroke-width="2.18"/>
-<line x1="102.6" y1="291.4" x2="497.4" y2="291.4" stroke-opacity="0.61" stroke-width="2.02"/>
-<line x1="125.4" y1="259.0" x2="474.6" y2="259.0" stroke-opacity="0.58" stroke-width="1.86"/>
-<line x1="143.3" y1="233.6" x2="456.7" y2="233.6" stroke-opacity="0.55" stroke-width="1.70"/>
-<line x1="157.7" y1="213.1" x2="442.3" y2="213.1" stroke-opacity="0.52" stroke-width="1.54"/>
-<line x1="169.5" y1="196.3" x2="430.5" y2="196.3" stroke-opacity="0.49" stroke-width="1.38"/>
-<line x1="179.4" y1="182.2" x2="420.6" y2="182.2" stroke-opacity="0.46" stroke-width="1.22"/>
-<line x1="187.8" y1="170.3" x2="412.2" y2="170.3" stroke-opacity="0.43" stroke-width="1.06"/>
-<line x1="195.0" y1="160.0" x2="405.0" y2="160.0" stroke-opacity="0.40" stroke-width="0.90"/>
-<line x1="185.0" y1="459.5" x2="200.3" y2="459.5" stroke-opacity="0.32" stroke-width="1.4"/>
-<line x1="399.7" y1="459.5" x2="415.0" y2="459.5" stroke-opacity="0.32" stroke-width="1.4"/>
-<line x1="189.8" y1="440.8" x2="204.5" y2="440.8" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="395.5" y1="440.8" x2="410.2" y2="440.8" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="194.2" y1="423.6" x2="208.3" y2="423.6" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="391.7" y1="423.6" x2="405.8" y2="423.6" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="198.3" y1="407.8" x2="211.8" y2="407.8" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="388.2" y1="407.8" x2="401.7" y2="407.8" stroke-opacity="0.31" stroke-width="1.4"/>
-<line x1="205.5" y1="379.7" x2="218.1" y2="379.7" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="381.9" y1="379.7" x2="394.5" y2="379.7" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="208.7" y1="367.1" x2="220.9" y2="367.1" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="379.1" y1="367.1" x2="391.3" y2="367.1" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="211.7" y1="355.3" x2="223.5" y2="355.3" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="376.5" y1="355.3" x2="388.3" y2="355.3" stroke-opacity="0.30" stroke-width="1.4"/>
-<line x1="214.5" y1="344.4" x2="225.9" y2="344.4" stroke-opacity="0.29" stroke-width="1.4"/>
-<line x1="374.1" y1="344.4" x2="385.5" y2="344.4" stroke-opacity="0.29" stroke-width="1.4"/>
-<line x1="219.6" y1="324.5" x2="230.3" y2="324.5" stroke-opacity="0.29" stroke-width="1.4"/>
-<line x1="369.7" y1="324.5" x2="380.4" y2="324.5" stroke-opacity="0.29" stroke-width="1.4"/>
-<line x1="221.9" y1="315.5" x2="232.3" y2="315.5" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="367.7" y1="315.5" x2="378.1" y2="315.5" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="224.1" y1="307.0" x2="234.2" y2="307.0" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="365.8" y1="307.0" x2="375.9" y2="307.0" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="226.2" y1="299.0" x2="236.0" y2="299.0" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="364.0" y1="299.0" x2="373.8" y2="299.0" stroke-opacity="0.28" stroke-width="1.4"/>
-<line x1="229.9" y1="284.2" x2="239.3" y2="284.2" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="360.7" y1="284.2" x2="370.1" y2="284.2" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="231.7" y1="277.4" x2="240.8" y2="277.4" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="359.2" y1="277.4" x2="368.3" y2="277.4" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="233.3" y1="270.9" x2="242.2" y2="270.9" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="357.8" y1="270.9" x2="366.7" y2="270.9" stroke-opacity="0.27" stroke-width="1.4"/>
-<line x1="234.9" y1="264.8" x2="243.6" y2="264.8" stroke-opacity="0.26" stroke-width="1.4"/>
-<line x1="356.4" y1="264.8" x2="365.1" y2="264.8" stroke-opacity="0.26" stroke-width="1.4"/>
-<line x1="237.8" y1="253.4" x2="246.1" y2="253.4" stroke-opacity="0.26" stroke-width="1.4"/>
-<line x1="353.9" y1="253.4" x2="362.2" y2="253.4" stroke-opacity="0.26" stroke-width="1.4"/>
-<line x1="239.2" y1="248.1" x2="247.3" y2="248.1" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="352.7" y1="248.1" x2="360.8" y2="248.1" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="240.5" y1="243.0" x2="248.4" y2="243.0" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="351.6" y1="243.0" x2="359.5" y2="243.0" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="241.7" y1="238.2" x2="249.5" y2="238.2" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="350.5" y1="238.2" x2="358.3" y2="238.2" stroke-opacity="0.25" stroke-width="1.4"/>
-<line x1="244.1" y1="229.1" x2="251.5" y2="229.1" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="348.5" y1="229.1" x2="355.9" y2="229.1" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="245.1" y1="224.9" x2="252.4" y2="224.9" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="347.6" y1="224.9" x2="354.9" y2="224.9" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="246.2" y1="220.8" x2="253.3" y2="220.8" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="346.7" y1="220.8" x2="353.8" y2="220.8" stroke-opacity="0.24" stroke-width="1.4"/>
-<line x1="247.2" y1="216.9" x2="254.2" y2="216.9" stroke-opacity="0.23" stroke-width="1.4"/>
-<line x1="345.8" y1="216.9" x2="352.8" y2="216.9" stroke-opacity="0.23" stroke-width="1.4"/>
-<line x1="249.1" y1="209.5" x2="255.9" y2="209.5" stroke-opacity="0.23" stroke-width="1.4"/>
-<line x1="344.1" y1="209.5" x2="350.9" y2="209.5" stroke-opacity="0.23" stroke-width="1.4"/>
-<line x1="250.0" y1="206.0" x2="256.6" y2="206.0" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="343.4" y1="206.0" x2="350.0" y2="206.0" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="250.8" y1="202.6" x2="257.4" y2="202.6" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="342.6" y1="202.6" x2="349.2" y2="202.6" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="251.7" y1="199.4" x2="258.1" y2="199.4" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="341.9" y1="199.4" x2="348.3" y2="199.4" stroke-opacity="0.22" stroke-width="1.4"/>
-<line x1="253.2" y1="193.3" x2="259.5" y2="193.3" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="340.5" y1="193.3" x2="346.8" y2="193.3" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="254.0" y1="190.4" x2="260.1" y2="190.4" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="339.9" y1="190.4" x2="346.0" y2="190.4" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="254.7" y1="187.6" x2="260.7" y2="187.6" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="339.3" y1="187.6" x2="345.3" y2="187.6" stroke-opacity="0.21" stroke-width="1.4"/>
-<line x1="255.4" y1="184.8" x2="261.3" y2="184.8" stroke-opacity="0.20" stroke-width="1.4"/>
-<line x1="338.7" y1="184.8" x2="344.6" y2="184.8" stroke-opacity="0.20" stroke-width="1.4"/>
-<line x1="256.7" y1="179.7" x2="262.5" y2="179.7" stroke-opacity="0.20" stroke-width="1.4"/>
-<line x1="337.5" y1="179.7" x2="343.3" y2="179.7" stroke-opacity="0.20" stroke-width="1.4"/>
-<line x1="257.3" y1="177.2" x2="263.0" y2="177.2" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="337.0" y1="177.2" x2="342.7" y2="177.2" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="258.0" y1="174.8" x2="263.6" y2="174.8" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="336.4" y1="174.8" x2="342.0" y2="174.8" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="258.5" y1="172.5" x2="264.1" y2="172.5" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="335.9" y1="172.5" x2="341.5" y2="172.5" stroke-opacity="0.19" stroke-width="1.4"/>
-<line x1="259.7" y1="168.1" x2="265.0" y2="168.1" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="335.0" y1="168.1" x2="340.3" y2="168.1" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="260.2" y1="166.0" x2="265.5" y2="166.0" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="334.5" y1="166.0" x2="339.8" y2="166.0" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="260.7" y1="163.9" x2="266.0" y2="163.9" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="334.0" y1="163.9" x2="339.3" y2="163.9" stroke-opacity="0.18" stroke-width="1.4"/>
-<line x1="261.3" y1="161.9" x2="266.4" y2="161.9" stroke-opacity="0.17" stroke-width="1.4"/>
-<line x1="333.6" y1="161.9" x2="338.7" y2="161.9" stroke-opacity="0.17" stroke-width="1.4"/>
-<line x1="-30.0" y1="480.0" x2="195.0" y2="160.0" stroke-opacity=".5" stroke-width="2"/>
-<line x1="630.0" y1="480.0" x2="405.0" y2="160.0" stroke-opacity=".5" stroke-width="2"/>
-</g>
-<g fill="#ffffff" font-family="Inter,system-ui,sans-serif" font-weight="800" text-anchor="middle">
-<text x="156.7" y="329.1" font-size="15.2" fill-opacity="0.31">30</text>
-<text x="443.3" y="329.1" font-size="15.2" fill-opacity="0.31">30</text>
-<text x="190.0" y="254.0" font-size="11.6" fill-opacity="0.29">20</text>
-<text x="410.0" y="254.0" font-size="11.6" fill-opacity="0.29">20</text>
-<text x="210.3" y="208.1" font-size="9.5" fill-opacity="0.26">10</text>
-<text x="389.7" y="208.1" font-size="9.5" fill-opacity="0.26">10</text>
-</g>
-
-<!-- play diagram: generic offensive alignment and routes, no team identity -->
-<g transform="translate(130 196)">
-<rect x="0" y="0" width="176" height="116" rx="13" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".2"/>
-<text x="14" y="23" fill="#9fd8b8" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="800" letter-spacing="1.2">PLAY CONCEPT</text>
-<line x1="14" y1="76" x2="162" y2="76" stroke="#ffffff" stroke-opacity=".34" stroke-width="1.2"/>
-<g stroke="#7fe3a8" stroke-width="1.9" fill="none" stroke-linecap="round">
-<path d="M32 76v-18l-11-11"/><path d="M64 76v-26"/><path d="M110 76v-14l16-14"/><path d="M148 76v-30"/>
-</g>
-<g fill="none" stroke="#e8f2ff" stroke-width="1.7">
-<circle cx="32" cy="76" r="4.4"/><circle cx="64" cy="76" r="4.4"/><circle cx="88" cy="76" r="4.4"/><circle cx="110" cy="76" r="4.4"/><circle cx="148" cy="76" r="4.4"/>
-</g>
-<g stroke="#ff9db0" stroke-width="1.8" stroke-linecap="round">
-<path d="M84 96l8 8M92 96l-8 8"/><path d="M124 96l8 8M132 96l-8 8"/>
-</g>
-<path d="M88 76v14" stroke="#e8f2ff" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="3 3"/>
-</g>
-<!-- football -->
-<g transform="translate(398 344) rotate(-24)">
-<ellipse rx="54" ry="33" fill="#8b4527"/>
-<ellipse rx="54" ry="33" fill="none" stroke="#f6e9dc" stroke-opacity=".9" stroke-width="2.2"/>
-<path d="M-38 0h76" stroke="#f8f1e8" stroke-width="3.1" stroke-linecap="round"/>
-<g stroke="#f8f1e8" stroke-width="2.9" stroke-linecap="round">
-<path d="M-21-8v16"/><path d="M-7-10v20"/><path d="M7-10v20"/><path d="M21-8v16"/>
-</g>
-</g>
-</svg>
-<div class="art-caption"><span>Week 1 · under the lights</span></div>
-</div>
-</div></div></section>
+</div></section>
 
 <div class="wrap" id="odds">
 
@@ -895,58 +668,102 @@ td strong{color:var(--ink)}
 
 <section class="mast"><div class="feed-state feed-status" id="feedStatus"><strong>Live odds integration in progress</strong><span id="feedDetail"></span></div></section>
 
-<section class="controls board-only" aria-label="Board controls"><div class="marketbar"><div class="mkt-tabs" role="tablist" aria-label="Market"><button class="mkt active" data-market="spread" role="tab" aria-selected="true">Spread</button><button class="mkt" data-market="moneyline" role="tab" aria-selected="false">Moneyline</button><button class="mkt" data-market="total" role="tab" aria-selected="false">Total</button></div><div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="primetime">Primetime</button><button class="filter" data-filter="props">Props</button></div></div></section>
+<section class="controls" aria-label="Board controls"><div class="marketbar"><div class="mkt-tabs" role="tablist" aria-label="Market"><button class="mkt active" data-market="spread" role="tab" aria-selected="true">Spread</button><button class="mkt" data-market="moneyline" role="tab" aria-selected="false">Moneyline</button><button class="mkt" data-market="total" role="tab" aria-selected="false">Total</button></div><div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="primetime">Primetime</button><button class="filter" data-filter="props">Props</button></div></div></section>
 
 <div class="board-layout">
-<section class="board board-only"><div class="board-title"><h2 id="boardHeading">NFL Matchups</h2><div><span id="boardTimestamp"></span><span class="fee-tag">+ 5% Whop service fee</span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Unlock MonsterGPT</a></div></div><div class="columns"><span>Matchup</span><span id="colOpen">First seen</span><span>Move</span><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span><span>MonsterGPT</span></div><div id="games"><div class="empty-state"><strong>Live odds integration in progress</strong><p>Verified odds for this slate are not published yet.</p></div></div></section>
 
-<section class="research" id="research" aria-label="MonsterGPT NFL Week 1 research">
-<div class="research-head"><span class="research-eyebrow">MonsterGPT · NFL Week 1 research</span><h2>Run <span class="week-echo">Week 1</span> research the way an analyst would</h2><p>MonsterGPT organises the questions worth asking about a football game and keeps your reasoning in one place across the week. It does not accept or place wagers, and it does not sell picks.</p></div>
-<div class="research-grid">
-<article class="rcard"><span class="rnum">01</span><h3>Matchup analysis</h3><p>Work through how two teams actually collide — pace, personnel groupings, pressure and coverage tendencies, and which side of the ball decides the game. Ask follow-ups until the picture holds together.</p></article>
-<article class="rcard"><span class="rnum">02</span><h3>Injury context</h3><p>Go past the status tag. Who absorbs the snaps, which roles change shape, and what a designation actually implies for a game plan rather than for a headline.</p></article>
-<article class="rcard"><span class="rnum">03</span><h3>Player research</h3><p>Study how a role is built: usage dependencies, what happens to it when the depth chart moves, and which follow-up questions separate a real change from a noisy week.</p></article>
-<article class="rcard"><span class="rnum">04</span><h3>Line-movement research</h3><p>Frame what a move means. Compare where a number started against where it sits, separate injury news from market flow, and decide what still needs verifying.</p></article>
-</div>
-<div class="research-foot"><div class="research-foot-l"><strong>Full MonsterGPT access · $27 / week</strong><small>Whop applies a 5% service fee at checkout.</small></div><a class="research-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Start researching</a></div>
-</section>
+<section class="board"><div class="board-title"><h2 id="boardHeading">NFL Matchups</h2><div><span id="boardTimestamp"></span><span class="fee-tag">+ 5% Whop service fee</span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Unlock MonsterGPT</a></div></div><div class="columns"><span>Matchup</span><span id="colOpen">First seen</span><span>Move</span><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span><span>MonsterGPT</span></div><div id="games"><div class="empty-state"><strong>Live odds integration in progress</strong><p>Verified odds for this slate are not published yet.</p></div></div></section>
 
-<aside class="side"><div class="side-card" id="monster"><h3>MonsterGPT Research Access</h3><p>Ask about matchup context, injuries, player roles, trends and line movement — with follow-ups, in plain language. MonsterGPT does not accept or place wagers.</p><p class="fee-line">Whop applies a 5% service fee at checkout.</p><a class="mini-cta" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a></div><div class="side-card"><h3>What MonsterGPT does</h3><div class="legend"><div><span>Research</span><small>Matchups, injuries and players</small></div><div><span>Context</span><small>Trends and line moves</small></div><div><span>Never</span><small>Picks or wagers</small></div></div></div></aside>
+<aside class="side" aria-label="MonsterGPT access and board key">
+<div class="card buy-card">
+<span class="k">MonsterGPT</span>
+<h3>NFL research access</h3>
+<div class="price">$27 <span>/ week</span></div>
+<p class="fee">Whop applies a 5% service fee at checkout.</p>
+<a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
+<ul>
+<li>Matchup research on every game</li>
+<li>Injury and role context</li>
+<li>Line-movement reasoning</li>
+<li>Follow-up questions in plain language</li>
+</ul>
+</div>
+
+<div class="card">
+<div class="rail-head">Reading the board</div>
+<div class="legend">
+<div><span class="chip">BEST</span>Best available line across the three books</div>
+<div><b class="up">▲ 1.5</b>Line moved up since first seen</div>
+<div><b class="down">▼ 1.5</b>Line moved down since first seen</div>
+<div><b>—</b>Not priced by that book</div>
 </div>
 </div>
 
-<section class="section" id="matchups"><div class="wrap">
-<div class="section-head"><div><span class="kicker">Week 1 research capabilities</span><h2>Matchup, player and market research</h2><p>Three research surfaces you can run against any Week 1 football game. Every answer is reasoning you can interrogate — never a pick, a guarantee or a wager.</p></div></div>
-<div class="cap-grid">
-<article class="cap">
-<div class="icn"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#0f9d52" stroke-width="1.7" stroke-linecap="round"><path d="M3 18h18"/><path d="M6 18V9m0 0-2 2m2-2 2 2"/><circle cx="13" cy="7" r="2.4"/><path d="M17.6 12.4 20 10"/><path d="M11 12.6 13.4 15"/></svg></div>
-<h3>Matchup research</h3>
-<p>Break a football game into the parts that decide it: tempo, personnel groupings, pressure looks, coverage tendencies and the situational splits that actually repeat.</p>
-<ul><li>How two schemes collide</li><li>Which unit decides the game</li><li>Situational and pace splits</li><li>Follow-ups until it holds up</li></ul>
-</article>
-<article class="cap">
-<div class="icn"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#0f9d52" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="6.4" r="2.6"/><path d="M4.4 20v-4.2A3.6 3.6 0 0 1 8 12.2a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M15 8.5h5M17.5 6v5"/><path d="M14.6 16.5h5.8"/><path d="M14.6 19.6h3.6"/></svg></div>
-<h3>Injury &amp; player research</h3>
-<p>Read past the designation. Trace who absorbs the snaps, how a role is really built, what changes when the depth chart moves, and what the status tag does not tell you.</p>
-<ul><li>Snap and usage dependencies</li><li>Role shape, not headline status</li><li>Depth-chart knock-on effects</li><li>What still needs verifying</li></ul>
-</article>
-<article class="cap" id="line-movement">
-<div class="icn"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#6d3bea" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5 8 11l3.4 3.4L20 6"/><path d="M15.6 6H20v4.4"/><path d="M3 20.5h18" stroke-opacity=".45"/></svg></div>
-<h3>Market-movement research</h3>
-<p>Frame what a move means before you trust it. Compare where a number started against where it sits, separate news from flow, and decide which explanation survives scrutiny.</p>
-<ul><li>Opened versus current</li><li>News-driven or flow-driven</li><li>Book-to-book disagreement</li><li>What the move does not prove</li></ul>
-</article>
+<div class="card">
+<div class="rail-head">Ask MonsterGPT</div>
+<div class="prompts">
+<p>How do these two offensive lines collide on early downs?</p>
+<p>What does this injury designation do to the game plan?</p>
+<p>What is this line move actually telling me?</p>
+</div>
+</div>
+</aside>
+
+</div>
+</div>
+
+<section class="section alt" id="matchups"><div class="wrap">
+<div class="section-head"><span class="kicker">Matchups</span><h2>Matchup, player and market research</h2><p>Every game on the board opens into MonsterGPT research. Ask follow-ups in plain language — it organizes context, it does not sell picks.</p></div>
+<div class="grid-3">
+<div class="tile"><span class="tag">Matchup research</span><h3>How the styles collide</h3><p>Pace, personnel groupings and pressure looks, framed against what the opponent actually does on early downs.</p></div>
+<div class="tile"><span class="tag">Injury &amp; player research</span><h3>Who absorbs the snaps</h3><p>What a designation changes about a game plan, and which roles expand when it holds.</p></div>
+<div class="tile"><span class="tag">Market-movement research</span><h3>Where the number sits</h3><p>First-seen versus current across the three books, and what the disagreement between them implies.</p></div>
 </div>
 </div></section>
 
-<section class="comparison section board-only" id="comparison"><div class="wrap"><div class="section-head"><div><span class="kicker">Sportsbook comparison</span><h2>Sportsbook line comparison</h2><p>FanDuel Sportsbook, DraftKings Sportsbook and BetMGM numbers, shown side by side with the time each was published.</p></div><span class="badge" id="comparisonStatus"></span></div><div class="table-wrap"><table><thead><tr><th>Market</th><th class="col-fd">FanDuel</th><th>DraftKings</th><th>BetMGM</th><th id="thOpen">First seen → Current</th></tr></thead><tbody id="comparisonRows"><tr><td colspan="5">Updating.</td></tr></tbody></table></div><div id="sportsbooks" class="sites"><div class="site-card"><strong>OddsChecker</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div><div class="site-card"><strong>Action Network</strong><span>Comparison-site reference placement. No ranking, bonus or affiliate claim.</span></div></div></div></section>
+<section class="section" id="line-movement"><div class="wrap">
+<div class="section-head"><span class="kicker">Line movement</span><h2>First seen versus where it sits now</h2><p>Every market on the board carries the first price Monster.bet observed, the current consensus, and the direction and size of the move between them. Numbers are never adjusted locally — a line changes on the board only when a newer verified snapshot publishes it.</p></div>
+<div class="grid-3">
+<div class="tile"><span class="tag">Direction</span><h3>Up, down or unchanged</h3><p>Shown per matchup in the Move column, with the size of the move to one decimal place.</p></div>
+<div class="tile"><span class="tag">Disagreement</span><h3>Where the books split</h3><p>When FanDuel, DraftKings and BetMGM price a market differently, the gap is stated in points or cents.</p></div>
+<div class="tile"><span class="tag">Provenance</span><h3>Labelled, not implied</h3><p>The column reads <em>First seen</em> unless a licensed opening line is available, in which case it reads <em>Opening</em>.</p></div>
+</div>
+</div></section>
 
-<section class="section" id="insights"><div class="wrap">
-<div class="section-head"><div><span class="kicker">NFL intelligence workflow</span><h2>How a Week 1 research session runs</h2><p>Compact modules designed to sit beside the odds board once verified prices are live.</p></div></div>
-<div class="insights-grid">
-<article class="insight"><b>Matchup intelligence</b><h3>Frame how styles collide</h3><p>Organize pace, personnel, role and situational questions before drawing any conclusion, so the reasoning is visible rather than asserted.</p></article>
-<article class="insight"><b>Movement intelligence</b><h3>Read the whole timeline</h3><p>Compare where a number opened against where it sits now, and identify what still needs verifying before it changes your view.</p></article>
-<article class="insight"><b>Player research</b><h3>Understand role shape</h3><p>Study usage dependencies and follow-up questions without presenting picks or wagers of any kind.</p></article>
+<section class="research" id="monster"><div class="wrap" id="research">
+<div class="section-head"><span class="kicker">MonsterGPT</span><h2>Run an NFL research week the way an analyst would</h2><p>One place to keep a week of football reasoning: matchups, injuries, player roles and market movement, with follow-up questions that remember what you already asked.</p></div>
+<div class="research-grid">
+<div class="grid-3">
+<div class="tile"><span class="tag">Matchup analysis</span><h3>Frame how styles collide</h3><p>Tempo against personnel, pressure against protection, and what each side is trying to force.</p></div>
+<div class="tile"><span class="tag">Injury context</span><h3>Read the whole timeline</h3><p>Practice participation through designation, and what each step usually means for usage.</p></div>
+<div class="tile"><span class="tag">Player research</span><h3>Understand role shape</h3><p>Snap share, alignment and target quality — the shape of a role rather than one week's box score.</p></div>
+<div class="tile"><span class="tag">Line-movement research</span><h3>Explain the number</h3><p>What moved, by how much, and which book moved first.</p></div>
+</div>
+<div class="research-cta">
+<h3>MonsterGPT Research Access</h3>
+<p>Ask about matchup context, injuries, player roles, trends and line movement — with follow-ups, in plain language. MonsterGPT does not accept or place wagers.</p>
+<a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Start researching</a>
+<p class="fee">Whop applies a 5% service fee at checkout.</p>
+</div>
+</div>
+</div></section>
+
+<section class="comparison board-only" id="comparison"><div class="wrap">
+<div class="section-head"><span class="kicker">Sportsbooks</span><h2>Sportsbook line comparison</h2><p>Every market on the current slate, across all three books, with first-seen and current side by side. <span id="comparisonStatus"></span></p></div>
+<div class="table-shell" id="sportsbooks"><div class="table-scroll">
+<table>
+<thead><tr><th>Matchup &amp; market</th><th>FanDuel</th><th>DraftKings</th><th>BetMGM</th><th id="thOpen">First seen → Current</th></tr></thead>
+<tbody id="comparisonRows"></tbody>
+</table>
+</div></div>
+</div></section>
+
+<section class="section alt" id="insights"><div class="wrap">
+<div class="section-head"><span class="kicker">Insights</span><h2>How a research session runs</h2><p>Start at the board, open the matchup that interests you, and keep asking until the picture holds together.</p></div>
+<div class="grid-3">
+<div class="tile"><span class="tag">Step one</span><h3>Start from the number</h3><p>Find the market where the three books disagree most, or where the line has moved furthest from first seen.</p></div>
+<div class="tile"><span class="tag">Step two</span><h3>Open the matchup</h3><p>MonsterGPT summarizes the movement and the disagreement, then takes follow-up questions on either.</p></div>
+<div class="tile"><span class="tag">Step three</span><h3>Carry it through the week</h3><p>Injury designations and role changes land through the week; the same session keeps the context in one place.</p></div>
 </div>
 </div></section>
 
@@ -994,8 +811,7 @@ td strong{color:var(--ink)}
   }).observe(document.documentElement,{attributes:true,attributeFilter:['data-feed']});
   paint();
 })();
-</script>
-<script>
+</script><script>
 (function(){
   'use strict';
   var GA='G-5VBBKZWLYL', enabled=/^G-[A-Z0-9]+$/i.test(GA), query=new URLSearchParams(location.search), ref='(direct)';
@@ -1129,5 +945,5 @@ td strong{color:var(--ink)}
   function start(){if(feed.enabled&&feed.transport==='sse'&&feed.apiBase){var stream=new EventSource(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/stream');stream.addEventListener('snapshot',function(e){try{var s=JSON.parse(e.data);if(validSnapshot(s)){lastVerified=s;renderSnapshot(s)}}catch(_){} });stream.onerror=function(){stream.close();poll()}}else poll()}
   start();
 })();
-</script>
-</body></html>
+</script></body>
+</html>

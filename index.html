@@ -144,7 +144,13 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
   position:relative; border-radius:10px; overflow:hidden; height:360px;
   background:#0a1729; box-shadow:var(--shadow);
 }
-.hero-art svg{display:block; width:100%; height:100%}
+/* The illustrated stadium sits underneath as the fallback. If the photograph
+   is missing or fails to decode, its <picture> removes itself and this shows
+   through — the page is never left with a broken image or an empty panel. */
+.hero-illustration{position:absolute; inset:0; display:block; width:100%; height:100%}
+.hero-photo{position:absolute; inset:0; display:block; z-index:1}
+.hero-photo img{width:100%; height:100%; object-fit:cover; display:block}
+.art-caption{z-index:2}
 .art-caption{position:absolute; left:14px; top:13px}
 .art-caption span{
   display:inline-block; background:rgba(8,18,34,.66); color:#DCE9FA;
@@ -695,8 +701,14 @@ td.best-cell{background:var(--green-lt); color:var(--green-dk); font-weight:600}
 </div>
 <p class="hero-fee">Whop applies a 5% service fee at checkout.</p>
 </div>
-<div class="hero-art" aria-hidden="true">
-<svg viewBox="0 0 600 470" preserveAspectRatio="xMidYMid slice" role="presentation">
+<div class="hero-art">
+<picture class="hero-photo">
+<source type="image/webp" media="(max-width:800px)" srcset="/assets/nfl-hero-mobile.webp">
+<source type="image/jpeg" media="(max-width:800px)" srcset="/assets/nfl-hero-mobile.jpg">
+<source type="image/webp" srcset="/assets/nfl-hero-desktop.webp">
+<img src="/assets/nfl-hero-desktop.jpg" width="1280" height="768" alt="Fictional football players at the line of scrimmage in a floodlit night stadium, a quarterback reading the defence before the snap, with faint analytics route lines drawn over the marked turf." decoding="async" fetchpriority="high" onerror="this.closest('.hero-photo').remove()">
+</picture>
+<svg viewBox="0 0 600 470" preserveAspectRatio="xMidYMid slice" role="presentation" aria-hidden="true" class="hero-illustration">
 <defs>
 <linearGradient id="turf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0e7440"/><stop offset="1" stop-color="#0a3d27"/></linearGradient>
 <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5e7ff" stop-opacity=".30"/><stop offset="1" stop-color="#d5e7ff" stop-opacity="0"/></linearGradient>
@@ -1088,7 +1100,7 @@ td.best-cell{background:var(--green-lt); color:var(--green-dk); font-weight:600}
 </g>
 </g>
 </svg>
-<div class="art-caption"><span>Under the lights · original artwork</span></div>
+<div class="art-caption"><span>Under the lights</span></div>
 </div>
 </div></div></section>
 

@@ -27,7 +27,7 @@
    every screen size, and no wall of text anywhere.
 
    Two blocks are conditional and silent when they have nothing true to show:
-   #xenarb  — renders only if xenarb-nfl.json carries verified matchups
+   #nflIntel — renders only if the intelligence file carries verified matchups
    #liveBoard — the pre-existing odds board, display:none until data-feed flips
    Neither ever shows an empty state or a "coming soon".
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -117,8 +117,8 @@ img{max-width:100%; display:block}
 .sec-head h2{font-size:clamp(23px,3vw,32px); font-weight:800; line-height:1.13; margin-top:8px}
 .sec-head p{color:var(--mid); font-size:15.5px; margin-top:7px}
 
-/* ── XenArb module (hidden unless verified matchups exist) ─────────────── */
-#xenarb[hidden]{display:none !important}
+/* ── intelligence module (hidden unless verified matchups exist) ───────── */
+#nflIntel[hidden]{display:none !important}
 .xa-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px}
 .xa-fresh{display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--soft);
   font-variant-numeric:tabular-nums; margin-left:auto}
@@ -387,13 +387,13 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 </div></div>
 </section>
 
-<!-- ═══ LIVE XENARB INTELLIGENCE ═══════════════════════════════════════
-     Rendered only when xenarb-nfl.json carries verified matchups from the
-     Monster.bet/XenArb feed. Zero matchups, a stale file or a fetch failure
-     all leave this hidden — never an empty board, never a placeholder.   -->
-<section class="sec grey" id="xenarb" hidden aria-hidden="true"><div class="wrap">
+<!-- ═══ VERIFIED MONSTER.BET INTELLIGENCE ══════════════════════════════
+     Rendered only when the published intelligence file carries verified
+     matchups. Zero matchups, a stale file or a fetch failure all leave this
+     hidden — never an empty board, never a placeholder.                   -->
+<section class="sec grey" id="nflIntel" hidden aria-hidden="true"><div class="wrap">
 <div class="xa-head">
-<span class="kicker">Live now</span>
+<span class="kicker">Verified Monster.bet intelligence</span>
 <span class="xa-fresh" id="xaFresh"><i class="xa-dot"></i></span>
 </div>
 <div class="xa-list" id="xaList"></div>
@@ -620,13 +620,14 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
   },{rootMargin:'-60px 0px 0px 0px'}).observe(hero);
 })();
 </script><script>
-/* ── Live XenArb intelligence ────────────────────────────────────────────
-   Reads /xenarb-nfl.json, which is produced server-side by
-   scripts/build-xenarb-nfl.py against the Monster.bet (XenArb) API. The API
-   key never reaches the browser: the generator runs on the server and writes
-   only non-secret, already-validated fields.
+/* ── Verified Monster.bet intelligence ──────────────────────────────────
+   Reads /nfl-intel.json, a dated snapshot produced server-side by the build
+   script and committed with the page. It is not a live feed and does not
+   refresh on its own. The provider API key never reaches the browser: the
+   generator runs on the server and publishes only validated, non-secret
+   fields.
 
-   This module renders a matchup ONLY when the feed states it. It never
+   This module renders a matchup ONLY when the file states it. It never
    derives, rounds or fills in a value. Zero matchups, a stale file, a fetch
    failure or a malformed document all leave the section hidden — there is no
    empty state and no "coming soon" anywhere in this file.
@@ -636,7 +637,7 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
   'use strict';
   var MAX_AGE_MS = 6*60*60*1000;   // a snapshot older than this is not "live"
   var MIN_ROWS = 1, MAX_ROWS = 5;
-  var sec=document.getElementById('xenarb');
+  var sec=document.getElementById('nflIntel');
   if(!sec)return;
 
   function txt(el,s){el.textContent=String(s)}
@@ -723,14 +724,14 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
     txt(document.getElementById('xaFresh').appendChild(el('span')),
         'Source updated '+ago(age));
     txt(document.getElementById('xaSrc'),
-        'Source: '+(doc.source||'Monster.bet (XenArb)')+
+        'Source: '+(doc.source||'Verified Monster.bet intelligence')+
         (doc.sourceTimestamp?' · snapshot '+new Date(doc.sourceTimestamp).toUTCString():''));
     sec.hidden=false; sec.setAttribute('aria-hidden','false');
     return true;
   }
 
   try{
-    fetch('/xenarb-nfl.json',{cache:'no-store'})
+    fetch('/nfl-intel.json',{cache:'no-store'})
       .then(function(r){return r.ok?r.json():null})
       .then(function(d){ try{ render(d); }catch(_){} })
       .catch(function(){ /* stay hidden, silently */ });

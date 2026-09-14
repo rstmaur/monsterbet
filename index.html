@@ -1217,10 +1217,8 @@ details p + p{padding-top:0; margin-top:-6px}
   function formatLine(best){if(!best)return '—';return [best.selection,best.value,best.price].filter(function(v){return v!==null&&v!==undefined&&v!==''}).join(' · ')}
   function validTrace(best){return best&&best.provider&&best.sportsbook&&best.eventId&&best.marketId&&best.selection&&best.providerTimestamp&&best.xenarbIngestedAt}
   function validSnapshot(s){return s&&s.schemaVersion==='1.0'&&s.provider&&s.provider.name&&s.provider.timestamp&&s.xenarb&&s.xenarb.ingestedAt&&Array.isArray(s.events)&&s.events.every(function(e){return e.eventId&&e.kickoff&&e.teams&&e.teams.away&&e.teams.home&&e.markets&&['spread','moneyline','total'].every(function(k){var m=e.markets[k];return !m||(m.marketId&&m.opening!==undefined&&m.current!==undefined&&m.lastChangedAt&&(!m.best||validTrace(m.best)))})})}
-  // Board copy. The board is display:none until a verified snapshot arrives,
-  // so this never reaches a visitor while there is no data — and the page
-  // must never advertise a live board that does not exist yet.
-  var UPDATING='Odds unavailable';
+  // The one status string the visitor ever sees while there is nothing to show.
+  var UPDATING='Live NFL board coming soon';
   // mode: 'updating' hides the board and shows research; 'live'/'delayed' reveal
   // the board. Nothing here names an internal system, a vendor or a contract.
   function setStatus(mode,message,timestamp){
@@ -1294,7 +1292,7 @@ details p + p{padding-top:0; margin-top:-6px}
     if(!lastEvents||!lastEvents.length){var empty=document.createElement('div');empty.className='empty-state';
       var st=document.createElement('strong'),p=document.createElement('p');
       text(st,UPDATING);
-      text(p,'No verified odds for this slate.');
+      text(p,'Verified odds for this slate are not published yet.');
       empty.append(st,p);games.appendChild(empty);return}
     lastEvents.forEach(function(e){games.appendChild(gameCard(e))});
     applyFilter(document.querySelector('.filter.active')?.dataset.filter||'all')}

@@ -1197,9 +1197,7 @@ details p + p{padding-top:0; margin-top:-6px}
   var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
   var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content'];
-  /* Existing location values are unchanged. New sections on the conversion
-     page are appended before the fallback so a CTA never mislabels itself. */
-  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('.research')?'research_panel':a.closest('.intel')?'matchup_analysis':a.closest('.side')?'board_rail':a.closest('#demo')?'product_demo':a.closest('.final')?'final_cta':a.closest('#compare')?'tabs_comparison':a.closest('#how')?'how_it_works':a.closest('#included')?'included':a.closest('#faq')?'faq':'odds_board'}
+  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('.research')?'research_panel':a.closest('.intel')?'matchup_analysis':a.closest('.side')?'board_rail':'odds_board'}
   function decorateCta(a){
     if(!a||a.dataset.ctaBound==='1')return a;
     a.dataset.ctaBound='1';

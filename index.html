@@ -573,25 +573,37 @@ details p + p{padding-top:0; margin-top:-6px}
   .hero-photo img{object-position:52% 40%}
   .hero-scrim{background:
     linear-gradient(180deg, rgba(6,15,32,.86) 0%, rgba(6,15,32,.81) 26%, rgba(6,15,32,.88) 55%, rgba(6,15,32,.95) 78%, rgba(6,15,32,.98) 100%)}
-  .hero h1{font-size:clamp(28px,7.9vw,42px); margin-top:11px; line-height:1.06}
-  .hero-lede{font-size:15px; line-height:1.48; margin-top:11px}
-  .hero-cta{gap:9px; margin-top:17px}
-  .hero-cta .btn{font-size:15px; padding:13px 18px}
-  .hero-meta{gap:5px 13px; margin-top:11px}
-  .hero-meta span{font-size:12px}
+  .hero h1{font-size:clamp(28px,7.7vw,42px); margin-top:10px; line-height:1.05}
+  .hero-lede{font-size:14.5px; line-height:1.45; margin-top:10px}
+  /* The demo is the next thing on the page, so the secondary CTA does not need
+     to be a second full-width button competing with the primary one. */
+  .hero-cta{gap:4px; margin-top:15px; flex-direction:column; align-items:stretch}
+  .hero-cta .btn-primary{font-size:15px; padding:13px 18px}
+  .hero-cta .btn-ghost{
+    background:none; border:none; padding:9px 0 3px; font-size:13.5px; font-weight:700;
+    color:#9FE9C1; text-decoration:underline; text-underline-offset:4px; text-decoration-thickness:1px;
+  }
+  .hero-cta .btn-ghost:hover{background:none; color:#BFF3D8}
+  .hero-cta .btn-ghost::after{content:" \2193"}
+  .hero-meta{gap:4px 12px; margin-top:9px}
+  .hero-meta span{font-size:11.5px; gap:6px}
   .eyebrow{font-size:10.5px}
-  .hero-benefits{grid-template-columns:1fr; gap:9px; margin-top:22px; padding-bottom:22px}
-  .bnf{display:grid; grid-template-columns:28px 1fr; gap:0 12px; align-items:start; padding:12px 13px}
-  .bnf-i{width:28px; height:28px; border-radius:7px}
-  .bnf h3{font-size:14.5px}
-  .bnf p{font-size:13px; line-height:1.45}
+  .hero-benefits{grid-template-columns:1fr; gap:7px; margin-top:18px; padding-bottom:20px}
+  .bnf{display:grid; grid-template-columns:24px 1fr; gap:0 11px; align-items:start; padding:10px 12px; border-radius:10px}
+  .bnf-i{width:24px; height:24px; border-radius:6px}
+  .bnf-i svg{width:14px; height:14px}
+  .bnf h3{font-size:13.5px; line-height:1.25}
+  .bnf p{font-size:12.5px; line-height:1.38; margin-top:2px}
   .bnf-i{margin-bottom:0; grid-row:span 2}
   .bnf p{margin-top:3px}
   .hero-cta .btn{width:100%}
   .kitgrid{grid-template-columns:1fr}
   .kit{border-right:none; border-bottom:1px solid var(--line)}
   .kit:last-child{border-bottom:none}
-  .demo-head{flex-direction:column; align-items:flex-start; gap:14px}
+  .demo{padding-block:34px}
+  .demo-head{flex-direction:column; align-items:flex-start; gap:11px; margin-bottom:16px}
+  .demo .sec-head p{font-size:15px; margin-top:7px}
+  .demo-label{font-size:10.5px; padding:7px 11px}
   .chat-body{padding:16px 14px 6px}
   .chat-foot{padding:12px 14px 16px}
   .ans-body{padding:14px 14px 16px}
@@ -704,17 +716,17 @@ details p + p{padding-top:0; margin-top:-6px}
 <div class="bnf">
 <div class="bnf-i"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 15.5V9m4.33 6.5v-11M11.67 15.5v-7M16 15.5v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
 <h3>One brief instead of fifteen tabs</h3>
-<p>Matchup, injuries, usage and market movement arrive in a single answer — not spread across eleven sites you have to reconcile yourself.</p>
+<p>Matchup, injuries, usage and line movement in a single answer — not fifteen tabs.</p>
 </div>
 <div class="bnf">
 <div class="bnf-i"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5 3 6v4.5c0 3.4 2.9 6 7 7 4.1-1 7-3.6 7-7V6l-7-3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.2 10 9.4 12l3.6-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 <h3>Injuries and usage, translated</h3>
-<p>Not "questionable" — who actually absorbs the snaps, which package changes, and what it does to the game plan if the designation holds.</p>
+<p>Not just "questionable" — who actually absorbs the snaps, and what that does to the game plan.</p>
 </div>
 <div class="bnf">
 <div class="bnf-i"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 14.5c2.5 0 3.2-3.6 5.4-3.6 1.6 0 1.7 2.1 3.1 2.1 2 0 2.3-4.5 3.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 3.5v13h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 <h3>Follow-ups that remember the game</h3>
-<p>Ask "what if he sits?" and it answers about this matchup, not in general. The third question is usually the one that changes your read.</p>
+<p>Ask "what if he sits?" and it answers about this game, not football in general.</p>
 </div>
 </div>
 

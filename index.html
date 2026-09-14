@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-feed="updating">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,7 +17,6 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap">
 <link rel="preload" as="image" href="/assets/hero-mobile.webp" media="(max-width:800px)">
 <link rel="preload" as="image" href="/assets/hero-desktop.webp" media="(min-width:801px)">
-<script src="/board-config.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    Monster.bet — mobile-first NFL pre-lander.
@@ -26,10 +25,8 @@
    strong visual rhythm, a real football creative in the first viewport on
    every screen size, and no wall of text anywhere.
 
-   Two blocks are conditional and silent when they have nothing true to show:
-   #nflIntel — renders only if the intelligence file carries verified matchups
-   #liveBoard — the pre-existing odds board, display:none until data-feed flips
-   Neither ever shows an empty state or a "coming soon".
+   #nflIntel renders only if the intelligence file carries verified matchups,
+   and is silent otherwise — never an empty state, never a "coming soon".
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root{
@@ -45,7 +42,6 @@
   --shadow-lg:0 2px 6px rgba(8,21,43,.10), 0 28px 60px -34px rgba(8,21,43,.55);
   --ui:"Archivo","Helvetica Neue",Arial,sans-serif;
   --txt:"Public Sans","Helvetica Neue",Arial,sans-serif;
-  --open-label:"First seen ";
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
@@ -282,21 +278,6 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 .sticky-cta small{font-family:var(--txt); font-weight:400; font-size:10.5px; color:#9DB2CE}
 .sticky-cta .btn{margin-left:auto; flex:none; padding:11px 20px; font-size:14.5px}
 @media (prefers-reduced-motion:reduce){.sticky-cta{transition:none}}
-
-/* ═══ pre-existing odds board — untouched, hidden until data-feed flips ══ */
-.board-only{display:none}
-[data-feed="live"] .board-only,[data-feed="delayed"] .board-only{display:block}
-.board-only table{width:100%; border-collapse:collapse; font-size:13.5px}
-.board-only th,.board-only td{padding:8px 10px; border-bottom:1px solid var(--line); text-align:left}
-.board-only .game{border:1px solid var(--line); border-radius:10px; margin-bottom:8px}
-.board-only .game-row{display:grid; grid-template-columns:1.6fr .7fr .6fr repeat(3,1fr) .8fr;
-  gap:8px; padding:10px 12px; align-items:center}
-.board-only .bk.best,.board-only .best-cell{background:var(--green-lt)}
-.board-only .intel{display:none}
-.board-only .intel.open{display:block; padding:12px; border-top:1px solid var(--line)}
-.board-only .mkt,.board-only .filter,.board-only .day{border:1px solid var(--line);
-  border-radius:7px; padding:6px 12px; font-size:13px; background:var(--white)}
-.board-only .feed-state{padding:8px 12px; border:1px solid var(--line); border-radius:8px}
 
 /* ── responsive ────────────────────────────────────────────────────────── */
 @media (max-width:1000px){
@@ -571,28 +552,6 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 </div>
 </section>
 
-<!-- ═══ pre-existing odds board — hidden until verified data exists ═════ -->
-<div class="board-only" id="liveBoard">
-<div class="wrap">
-<span id="globalStatus"><i class="status-dot"></i></span><span id="globalTimestamp"></span>
-<section class="mast"><div class="feed-state feed-status" id="feedStatus"><strong></strong><span id="feedDetail"></span></div></section>
-<section class="weeknav"><div class="weeknav-card">
-<button class="wk-nav" id="wkPrev" aria-label="Previous week" disabled>&lsaquo;</button>
-<span class="wk-name" id="weekLabel">NFL Week 1</span><b id="weekDates">Regular season</b><i id="weekUpdated"></i>
-<button class="wk-nav" id="wkNext" aria-label="Next week">&rsaquo;</button>
-<span class="daystrip" id="dayStrip"><button class="day active" type="button">Thu night</button><button class="day" type="button">Sun early</button><button class="day" type="button">Sun late</button><button class="day" type="button">Sun night</button><button class="day" type="button">Mon night</button></span>
-</div></section>
-<section class="controls"><div class="marketbar"><div class="mkt-tabs" role="tablist" aria-label="Market"><button class="mkt active" data-market="spread" role="tab" aria-selected="true">Spread</button><button class="mkt" data-market="moneyline" role="tab" aria-selected="false">Moneyline</button><button class="mkt" data-market="total" role="tab" aria-selected="false">Total</button></div><div class="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="primetime">Primetime</button><button class="filter" data-filter="props">Props</button></div></div></section>
-<section class="board"><div class="board-title"><h2 id="boardHeading">NFL Matchups</h2><div><span id="boardTimestamp"></span><a href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Unlock MonsterGPT</a></div></div><div class="columns"><span>Matchup</span><span id="colOpen">First seen</span><span>Move</span><span>FanDuel</span><span>DraftKings</span><span>BetMGM</span><span>MonsterGPT</span></div><div id="games"></div></section>
-<section class="comparison" id="comparison"><p id="comparisonStatus"></p>
-<div class="table-shell"><div class="table-scroll"><table>
-<thead><tr><th>Matchup &amp; market</th><th>FanDuel</th><th>DraftKings</th><th>BetMGM</th><th id="thOpen">First seen &rarr; Current</th></tr></thead>
-<tbody id="comparisonRows"></tbody>
-</table></div></div>
-</section>
-</div>
-</div>
-
 <footer class="disclaimer"><div class="wrap">
 <p><strong>Monster.bet</strong> <span class="age">18+</span></p>
 <p><strong>Pricing:</strong> $27 / week, $77 / month, $770 / year. Whop adds a 5% service fee, making the totals $28.35, $80.85 and $808.50. Cancel anytime in your Whop account; access runs to the end of the paid period.</p>
@@ -739,37 +698,6 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 })();
 </script>
 <script>
-/* Week / slate navigation. Pure interface chrome: it moves the week label and
-   the slate-day selection, and asserts nothing about any game. While the feed
-   is updating it owns the label; once a verified snapshot arrives the board's
-   own renderer takes the label over and these controls stand down. */
-(function(){
-  'use strict';
-  var WEEKS=18, week=1;
-  var prev=document.getElementById('wkPrev'), next=document.getElementById('wkNext');
-  var label=document.getElementById('weekLabel'), echo=document.querySelectorAll('.week-echo');
-  function live(){return document.documentElement.getAttribute('data-feed')!=='updating'}
-  function paint(){
-    if(live())return;
-    label.textContent='NFL Week '+week;
-    echo.forEach(function(el){el.textContent='Week '+week});
-    prev.disabled=week<=1; next.disabled=week>=WEEKS;
-  }
-  prev.addEventListener('click',function(){if(week>1){week--;paint()}});
-  next.addEventListener('click',function(){if(week<WEEKS){week++;paint()}});
-  document.getElementById('dayStrip').addEventListener('click',function(e){
-    var b=e.target.closest('.day'); if(!b)return;
-    this.querySelectorAll('.day').forEach(function(x){x.classList.remove('active')});
-    b.classList.add('active');
-  });
-  // When a verified snapshot flips the page to its live face, the board's own
-  // renderer owns the week label; stand down rather than leave dead controls.
-  new MutationObserver(function(){
-    if(live()){prev.disabled=true;next.disabled=true}else{paint()}
-  }).observe(document.documentElement,{attributes:true,attributeFilter:['data-feed']});
-  paint();
-})();
-</script><script>
 (function(){
   'use strict';
   var GA='G-5VBBKZWLYL', enabled=/^G-[A-Z0-9]+$/i.test(GA), query=new URLSearchParams(location.search), ref='(direct)';
@@ -777,7 +705,9 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
   var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
   var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content'];
-  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('#demo')?'product_demo':a.closest('#compare')?'comparison':a.closest('#how')?'how_it_works':a.closest('.final')?'final_cta':a.closest('.research')?'research_panel':a.closest('.intel')?'matchup_analysis':a.closest('.side')?'board_rail':'odds_board'}
+  /* Every CTA on the page resolves to a real section; the fallback exists
+     only so a future CTA cannot report an empty location. */
+  function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('#demo')?'product_demo':a.closest('.final')?'final_cta':'other'}
   function decorateCta(a){
     if(!a||a.dataset.ctaBound==='1')return a;
     a.dataset.ctaBound='1';
@@ -792,116 +722,6 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
     return a}
   function decorateAllCtas(root){(root||document).querySelectorAll('a[data-product]').forEach(decorateCta)}
   decorateAllCtas(document);
-  var feed=window.MONSTERBET_BOARD||{}, lastVerified=null, retryMs=5000, pollTimer=null;
-  function text(el,value){if(el&&el.textContent!==String(value??'—'))el.textContent=String(value??'—')}
-  function formatLine(best){if(!best)return '—';return [best.selection,best.value,best.price].filter(function(v){return v!==null&&v!==undefined&&v!==''}).join(' · ')}
-  function validTrace(best){return best&&best.provider&&best.sportsbook&&best.eventId&&best.marketId&&best.selection&&best.providerTimestamp&&best.xenarbIngestedAt}
-  function validSnapshot(s){return s&&s.schemaVersion==='1.0'&&s.provider&&s.provider.name&&s.provider.timestamp&&s.xenarb&&s.xenarb.ingestedAt&&Array.isArray(s.events)&&s.events.every(function(e){return e.eventId&&e.kickoff&&e.teams&&e.teams.away&&e.teams.home&&e.markets&&['spread','moneyline','total'].every(function(k){var m=e.markets[k];return !m||(m.marketId&&m.opening!==undefined&&m.current!==undefined&&m.lastChangedAt&&(!m.best||validTrace(m.best)))})})}
-  // The one status string the visitor ever sees while there is nothing to show.
-  var UPDATING='Live NFL board coming soon';
-  // mode: 'updating' hides the board and shows research; 'live'/'delayed' reveal
-  // the board. Nothing here names an internal system, a vendor or a contract.
-  function setStatus(mode,message,timestamp){
-    var box=document.getElementById('feedStatus'),global=document.getElementById('globalStatus');
-    var state=(mode==='live'||mode==='delayed')?mode:'updating';
-    document.documentElement.setAttribute('data-feed',state);
-    box.className='feed-state feed-status '+state;
-    text(box.querySelector('strong'),state==='live'?'Odds updated':state==='delayed'?'Odds may not be current':UPDATING);
-    text(document.getElementById('feedDetail'),state==='updating'?'':(message||''));
-    text(global,state==='updating'?'':(state==='live'?'Odds updated':'Odds may not be current'));
-    text(document.getElementById('globalTimestamp'),state==='updating'?'':(timestamp||''));
-    text(document.getElementById('comparisonStatus'),state==='live'?'Updated':state==='delayed'?'May not be current':'');
-  }
-  var BOOKS=['FanDuel','DraftKings','BetMGM'];
-  var activeMarket='spread', lastEvents=null;
-  function quoteFor(m,book){if(!m||!Array.isArray(m.books))return null;
-    for(var i=0;i<m.books.length;i++){if(String(m.books[i].sportsbook).toLowerCase()===book.toLowerCase())return m.books[i]}return null}
-  function isBest(m,q){return !!(m&&m.best&&q&&String(m.best.sportsbook)===String(q.sportsbook)&&String(m.best.value)===String(q.value)&&String(m.best.price)===String(q.price))}
-  function bookCell(m,book){var d=document.createElement('div');d.className='bk';d.dataset.book=book;
-    var q=quoteFor(m,book);
-    if(!q){d.classList.add('na');var na=document.createElement('div');na.className='ln';text(na,'—');d.appendChild(na);return d}
-    var best=isBest(m,q); if(best)d.classList.add('best');
-    var ln=document.createElement('div');ln.className='ln';
-    text(ln,[q.selection,q.value].filter(function(v){return v!==null&&v!==undefined&&v!==''}).join(' '));
-    var pr=document.createElement('div');pr.className='pr';text(pr,q.price);
-    d.append(ln,pr);
-    if(best){var b=document.createElement('span');b.className='badge';text(b,'BEST');d.appendChild(b)}
-    d.title=q.sportsbook+' · '+q.provider+' · updated '+q.providerTimestamp;
-    return d}
-  function gameCard(e){var row=document.createElement('article');row.className='game';row.dataset.eventId=e.eventId;
-    row.dataset.kind=[e.status,'spreads','moneylines','totals'].concat(e.hasPlayerProps?['props']:[]).join(' ');
-    var m=e.markets[activeMarket];
-    var line=document.createElement('div');line.className='game-row';
-    var match=document.createElement('div');match.className='matchup';
-    var time=document.createElement('div');time.className='time';
-    text(time,new Date(e.kickoff).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})+' · '+e.status);
-    var away=document.createElement('div');away.className='team';text(away,e.teams.away);
-    var home=document.createElement('div');home.className='team';text(home,'@ '+e.teams.home);
-    match.append(time,away,home);
-    var opn=document.createElement('div');opn.className='opn';text(opn,m?m.opening:'—');
-    var mv=document.createElement('div');mv.className='mv '+(m?m.direction:'unchanged');
-    text(mv,m?(m.direction==='unchanged'||!Number(m.movementSize)?'—':((m.direction==='up'?'▲ ':'▼ ')+Math.abs(Number(m.movementSize)).toFixed(1))):'—');
-    line.append(match,opn,mv);
-    BOOKS.forEach(function(b){line.appendChild(bookCell(m,b))});
-    var button=document.createElement('button');button.className='analyze';button.setAttribute('aria-expanded','false');
-    text(button,'MonsterGPT');line.appendChild(button);
-    var intel=document.createElement('div');intel.className='intel';
-    var inner=document.createElement('div');inner.className='intel-inner';
-    var i=e.intelligence||{};
-    [['MonsterGPT · line movement',i.movementSummary],['MonsterGPT · book disagreement',i.sportsbookDisagreement]].forEach(function(pair){
-      var box=document.createElement('div');var h=document.createElement('h4');text(h,pair[0]);
-      var p=document.createElement('p');text(p,pair[1]||'Not available for this game.');
-      box.append(h,p);inner.appendChild(box)});
-    var meta=document.createElement('div');var mh=document.createElement('h4');text(mh,'Trace');
-    var mp=document.createElement('p');text(mp,m?('Market '+m.marketId+' · last changed '+m.lastChangedAt):'No market trace available.');
-    meta.append(mh,mp);
-    if(i.unusualMovement){var u=document.createElement('span');u.className='unusual';text(u,'UNUSUAL MOVEMENT');mh.appendChild(u)}
-    inner.appendChild(meta);
-    var gate=document.createElement('div');gate.className='intel-cta';
-    var gl=document.createElement('span');text(gl,'Full MonsterGPT matchup research \u00b7 $27 / week');
-    var gf=document.createElement('small');text(gf,'+ 5% Whop service fee at checkout');
-    var ga=document.createElement('a');ga.href='https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic';
-    ga.target='_blank';ga.rel='noopener';ga.dataset.product='monstergpt_weekly';text(ga,'Unlock');
-    gl.appendChild(gf);gate.append(gl,ga);decorateCta(ga);
-    inner.appendChild(gate);intel.appendChild(inner);
-    button.addEventListener('click',function(){var open=intel.classList.toggle('open');
-      button.setAttribute('aria-expanded',String(open));text(button,open?'Hide':'MonsterGPT')});
-    row.append(line,intel);return row}
-  function renderComparison(events){var body=document.getElementById('comparisonRows');body.replaceChildren();events.forEach(function(e){['spread','moneyline','total'].forEach(function(key){var m=e.markets[key];if(!m)return;var tr=document.createElement('tr'),name=document.createElement('td');var strong=document.createElement('strong');text(strong,e.teams.away+' @ '+e.teams.home+' · '+key);name.appendChild(strong);tr.appendChild(name);BOOKS.forEach(function(book){var td=document.createElement('td'),quote=quoteFor(m,book);if(quote&&isBest(m,quote))td.className='best-cell';text(td,quote?formatLine(quote):'—');tr.appendChild(td)});var movement=document.createElement('td');text(movement,m.opening+' → '+m.current);tr.appendChild(movement);body.appendChild(tr)})});if(!body.children.length){var tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;text(td,'No verified sportsbook comparison data.');tr.appendChild(td);body.appendChild(tr)}}
-  function renderBoard(){var games=document.getElementById('games');games.replaceChildren();
-    if(!lastEvents||!lastEvents.length){var empty=document.createElement('div');empty.className='empty-state';
-      var st=document.createElement('strong'),p=document.createElement('p');
-      text(st,UPDATING);
-      text(p,'Verified odds for this slate are not published yet.');
-      empty.append(st,p);games.appendChild(empty);return}
-    lastEvents.forEach(function(e){games.appendChild(gameCard(e))});
-    applyFilter(document.querySelector('.filter.active')?.dataset.filter||'all')}
-  function renderSnapshot(s,forcedMode){var providerTime=new Date(s.provider.timestamp),age=Date.now()-providerTime.getTime(),staleAfter=Number(feed.staleAfterMs)||120000,mode=forcedMode||(age>staleAfter?'delayed':'live');
-    setStatus(mode,mode==='delayed'?'Showing the last verified odds; they may have moved since.':'',(mode==='delayed'?'Published: ':'Updated: ')+providerTime.toLocaleString());
-    var licensedOpener=s.openingSource==='provider_historical';
-    var openWord=licensedOpener?'Opening':'First seen';
-    document.documentElement.style.setProperty('--open-label','"'+openWord+' "');
-    text(document.getElementById('colOpen'),openWord);
-    text(document.getElementById('thOpen'),openWord+' \u2192 Current');
-    var wl=String(s.weekLabel||'Current slate'),wparts=wl.split('\u00b7'),wname=wparts.shift().trim(),wrest=wparts.join('\u00b7').trim();
-    var wtime=mode==='delayed'?('Delayed \u00b7 '+providerTime.toLocaleTimeString()):('Updated '+providerTime.toLocaleTimeString());
-    text(document.getElementById('boardHeading'),'NFL Matchups');
-    text(document.getElementById('weekLabel'),wname);
-    text(document.getElementById('weekDates'),wrest||wtime);
-    text(document.getElementById('weekUpdated'),wrest?wtime:'');
-    text(document.getElementById('boardTimestamp'),mode==='delayed'?'Delayed · '+providerTime.toLocaleTimeString():'Last updated '+providerTime.toLocaleTimeString());
-    var strip=document.getElementById('dayStrip');strip.replaceChildren();
-    var seen={};s.events.forEach(function(e){var d=new Date(e.kickoff).toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
-      if(seen[d])return;seen[d]=1;var b=document.createElement('button');b.className='day';text(b,d);strip.appendChild(b)});
-    lastEvents=s.events;renderBoard();renderComparison(s.events)}
-  function applyFilter(f){document.querySelectorAll('.game').forEach(function(g){g.classList.toggle('hidden',f!=='all'&&!g.dataset.kind.split(' ').includes(f))})}
-  document.querySelectorAll('.mkt').forEach(function(b){b.addEventListener('click',function(){
-    document.querySelectorAll('.mkt').forEach(function(x){x.classList.remove('active');x.setAttribute('aria-selected','false')});
-    b.classList.add('active');b.setAttribute('aria-selected','true');activeMarket=b.dataset.market;renderBoard()})});
-  document.querySelectorAll('.filter').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.filter').forEach(function(x){x.classList.remove('active')});b.classList.add('active');applyFilter(b.dataset.filter)})});
-  async function poll(){if(!feed.enabled||!feed.apiBase){setStatus('updating');return}try{var response=await fetch(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/board',{headers:{Accept:'application/json'},cache:'no-store'});if(response.status===429){var wait=Number(response.headers.get('Retry-After'))*1000||retryMs;throw Object.assign(new Error('rate_limited'),{retryAfter:wait})}if(!response.ok)throw new Error('board_http_'+response.status);var snapshot=await response.json();if(!validSnapshot(snapshot))throw new Error('invalid_board_schema');lastVerified=snapshot;retryMs=5000;renderSnapshot(snapshot);pollTimer=setTimeout(poll,Number(feed.pollIntervalMs)||60000)}catch(error){if(lastVerified)renderSnapshot(lastVerified,'delayed');else setStatus('updating');retryMs=Math.min(error.retryAfter||retryMs*2,60000);pollTimer=setTimeout(poll,retryMs)}}
-  function start(){if(feed.enabled&&feed.transport==='sse'&&feed.apiBase){var stream=new EventSource(feed.apiBase.replace(/\/$/,'')+'/v1/nfl/stream');stream.addEventListener('snapshot',function(e){try{var s=JSON.parse(e.data);if(validSnapshot(s)){lastVerified=s;renderSnapshot(s)}}catch(_){} });stream.onerror=function(){stream.close();poll()}}else poll()}
-  start();
 })();
 </script></body>
 </html>

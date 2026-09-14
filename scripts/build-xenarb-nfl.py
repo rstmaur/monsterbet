@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build xenarb-nfl.json for the public pre-lander.
+"""Build the public nfl-intel.json snapshot for the pre-lander.
 
 Runs server-side ONLY. Reads MONSTER_API_KEY from /home/xenhive/xenarb/.env and
 never writes it to the output. Emits a matchup only when the live feed carries
@@ -11,7 +11,7 @@ import json, os, sys, urllib.request, datetime
 
 ENVF = '/home/xenhive/xenarb/.env'
 API = 'https://api-v2.monster.bet/v1/arbitrage/snapshot?sport=all&limit=200'
-OUT = sys.argv[1] if len(sys.argv) > 1 else 'site/xenarb-nfl.json'
+OUT = sys.argv[1] if len(sys.argv) > 1 else 'site/nfl-intel.json'
 
 key = None
 for line in open(ENVF, encoding='utf-8', errors='replace'):
@@ -86,7 +86,8 @@ matchups = [m for m in (to_matchup(i) for i in cands) if m][:5]
 
 doc = {
     'schemaVersion': '1.0',
-    'source': 'Monster.bet arbitrage API v1 (XenArb)',
+    # Public-facing label. Must not carry the internal XenArb name.
+    'source': 'Verified Monster.bet intelligence',
     'sourceTimestamp': src_ts,
     'generatedAt': datetime.datetime.now(datetime.timezone.utc)
                    .replace(microsecond=0).isoformat().replace('+00:00', 'Z'),

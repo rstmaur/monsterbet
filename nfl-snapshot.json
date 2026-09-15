@@ -1,0 +1,64 @@
+{
+ "_note": "Sanitized display fixture from a captured read-only product inspection. Not a live feed. No identifiers, no auth metadata.",
+ "capture": {
+  "kind": "captured_product_demonstration",
+  "whale_watch": {
+   "source_freshest_at": "2026-09-15T02:40:18.436686+00:00",
+   "source_generated_at": "2026-09-15T02:40:24.698010926+00:00",
+   "collected_at": "2026-09-15T02:42:00Z"
+  },
+  "projections": {
+   "source_computation_time": null,
+   "collected_at": "2026-09-15T02:44:42Z"
+  },
+  "gap_between_panels": "2 min 42 s"
+ },
+ "league": "NFL",
+ "matchup": {
+  "title": "Detroit Lions @ Buffalo Bills",
+  "away": {
+   "name": "Detroit Lions",
+   "abbr": "DET"
+  },
+  "home": {
+   "name": "Buffalo Bills",
+   "abbr": "BUF"
+  },
+  "kickoff_utc": "2026-09-18T00:15:00+00:00"
+ },
+ "projections": {
+  "away_score": 25.6124267578125,
+  "home_score": 28.876708984375,
+  "total": 54.4891357421875,
+  "home_margin": 3.2642822265625,
+  "away_win_probability": 0.41888427734375,
+  "home_win_probability": 0.58111572265625
+ },
+ "market": {
+  "type": "NFL Spread",
+  "selection": "Buffalo Bills -4.5",
+  "line_value": -4.5,
+  "best_ask": {
+   "american": -102,
+   "venue": "ProphetX"
+  },
+  "best_bid": {
+   "american": -100,
+   "venue": "Kalshi"
+  },
+  "standing_bid_liquidity_usd": 325181.8,
+  "venues": [
+   "Kalshi",
+   "Polymarket",
+   "ProphetX"
+  ],
+  "actionable": false,
+  "consumer_signal": "standing_orderbook_liquidity",
+  "actionable_note": "Field value reported as-is. Provider publishes no definition; we draw no conclusion from it."
+ },
+ "derived": {
+  "liquidity_weighted_avg_bid_american": 160,
+  "formula": "sum(price x liquidity) / sum(liquidity)",
+  "computed_by": "client-side"
+ }
+}

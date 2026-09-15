@@ -336,6 +336,61 @@ img{max-width:100%; height:auto; display:block}
   .btn{transition:none}
   .sticky-cta{transition:none}
 }
+
+/* ── NFL Market Snapshot — captured product demonstration ──────────────── */
+.snap{margin-top:34px; background:rgba(11,27,51,.93);
+  border:1px solid rgba(255,255,255,.13); border-radius:16px; padding:20px}
+.snap-hd{display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.snap-kick{display:block; font-family:var(--ui); font-size:11px; font-weight:800;
+  letter-spacing:.09em; text-transform:uppercase; color:#14C46A; margin-bottom:3px}
+.snap-hd h3{font-size:19px; font-weight:800; color:#fff}
+.snap-cap{font-size:11.5px; font-weight:700; color:#F0B354;
+  border:1px solid rgba(240,179,84,.35); border-radius:999px; padding:5px 10px}
+.snap-match{border-top:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.1); padding:12px 0; margin-bottom:14px}
+.snap-teams{font-family:var(--ui); font-size:19px; font-weight:800; color:#fff;
+  display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+.snap-at{color:#63779A; font-size:14px; font-weight:700}
+.snap-kickoff{margin-top:4px; font-size:12.5px; color:#8FA3C0; font-weight:600}
+.snap-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.snap-panel{background:rgba(14,34,66,.92); border:1px solid rgba(255,255,255,.1);
+  border-radius:13px; padding:14px}
+.snap-ph{display:flex; align-items:baseline; justify-content:space-between;
+  gap:8px; flex-wrap:wrap; margin-bottom:10px}
+.snap-ph h4{font-size:14px; font-weight:800; color:#CBD8EA}
+.snap-t{font-size:10.5px; color:#63779A; font-weight:700}
+.snap-sel{font-family:var(--ui); font-size:15px; font-weight:800; color:#fff;
+  margin-bottom:9px}
+.snap-rows{display:flex; flex-direction:column; gap:5px}
+.snap-r{display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+  padding:6px 9px; background:rgba(255,255,255,.04); border-radius:7px}
+.snap-r span{font-size:12.5px; color:#8FA3C0; font-weight:600}
+.snap-r b{font-family:var(--ui); font-size:15px; color:#fff; font-weight:800}
+.snap-derived{border:1px dashed rgba(240,179,84,.4); background:rgba(240,179,84,.06)}
+.snap-derived b{color:#F0B354}
+.snap-r abbr{cursor:help; color:#F0B354; text-decoration:none; font-size:11px}
+.snap-prob{margin-top:11px}
+.snap-pb{height:7px; border-radius:99px; background:rgba(255,255,255,.12);
+  overflow:hidden}
+.snap-pb i{display:block; height:100%; background:var(--green-br,#14C46A)}
+.snap-pl{display:flex; justify-content:space-between; margin-top:5px;
+  font-size:11.5px; color:#8FA3C0; font-weight:700}
+.snap-venues{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+.snap-venues span{font-size:11px; font-weight:700; color:#8FA3C0;
+  border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:3px 9px}
+.snap-note{margin-top:10px; font-size:11.5px; line-height:1.5; color:#8FA3C0}
+.snap-note b{color:#CBD8EA}
+.snap-foot{margin-top:13px; padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.1); font-size:12.5px; line-height:1.55;
+  color:#8FA3C0}
+.snap-foot b{color:#CBD8EA}
+@media(max-width:800px){
+  .snap-grid{grid-template-columns:1fr}
+  .snap-hd{flex-direction:column}
+  .snap-teams{font-size:17px}
+}
+
 </style>
 <body>
 
@@ -492,13 +547,64 @@ img{max-width:100%; height:auto; display:block}
 <!-- Verified NFL intelligence. Rendered ONLY when the published file carries
      complete verified signals; otherwise this stays display:none and nothing
      about it is visible — no empty state, no placeholder, no "coming soon". -->
-<section class="intel hidden" id="nflIntel" aria-labelledby="intelH">
-<div class="intel-hd">
-<h3 id="intelH">Verified NFL intelligence</h3>
-<span class="live"><i></i>Live</span>
-<span class="intel-fresh" id="intelFresh"></span>
+<section class="snap" id="nflSnapshot" aria-labelledby="snapH">
+<div class="snap-hd">
+<div>
+<span class="snap-kick">NFL · NFL Spread</span>
+<h3 id="snapH">NFL Market Snapshot</h3>
 </div>
-<div class="sigs" id="intelRows"></div>
+<span class="snap-cap">Captured product demonstration · 15 Sep 2026</span>
+</div>
+
+<div class="snap-match">
+<div class="snap-teams"><b>Detroit Lions</b>
+<span class="snap-at">@</span><b>Buffalo Bills</b></div>
+<div class="snap-kickoff">Kickoff Fri 18 Sep 2026 · 00:15 UTC</div>
+</div>
+
+<div class="snap-grid">
+
+<div class="snap-panel">
+<div class="snap-ph"><h4>Model projections</h4>
+<span class="snap-t">collected 02:44:42 UTC</span></div>
+<div class="snap-rows">
+<div class="snap-r"><span>DET projected</span><b>25.61</b></div>
+<div class="snap-r"><span>BUF projected</span><b>28.88</b></div>
+<div class="snap-r"><span>Projected total</span><b>54.49</b></div>
+<div class="snap-r"><span>Projected margin</span><b>BUF +3.26</b></div>
+</div>
+<div class="snap-prob">
+<div class="snap-pb"><i style="width:58.1%"></i></div>
+<div class="snap-pl"><span>BUF 58.112%</span>
+<span>DET 41.888%</span></div>
+</div>
+<p class="snap-note">Source computation time not exposed by the API — only our collection time is known.</p>
+</div>
+
+<div class="snap-panel">
+<div class="snap-ph"><h4>Order book</h4>
+<span class="snap-t">source 02:40:18 UTC · collected 02:42:00 UTC</span></div>
+<div class="snap-sel">Buffalo Bills -4.5</div>
+<div class="snap-rows">
+<div class="snap-r"><span>Best ask</span><b>-102</b></div>
+<div class="snap-r"><span>Best bid</span><b>-100</b></div>
+<div class="snap-r"><span>Standing bid liquidity</span><b>$325.2K</b></div>
+<div class="snap-r snap-derived"><span>Liquidity-weighted avg bid
+<abbr title="Client-side calculation: sum(price * liquidity) / sum(liquidity). Not a quoted price.">ⓘ</abbr></span>
+<b>+160</b></div>
+</div>
+<div class="snap-venues"><span>Kalshi</span><span>Polymarket</span><span>ProphetX</span></div>
+<p class="snap-note"><b>Standing orders, not settled bets.</b> This is resting
+order-book liquidity across three venues. The source marks this record
+<b>not actionable</b>.</p>
+</div>
+
+</div>
+
+<p class="snap-foot"><b>How to read this.</b> A captured demonstration of what
+Monster.bet returns — <b>not a live feed</b>. The two panels were collected
+<b>2 min 42 s apart</b> and do not represent the same instant. The
+liquidity-weighted average is computed by us, not quoted by any venue.</p>
 </section>
 
 </div>

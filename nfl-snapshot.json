@@ -1,5 +1,5 @@
 {
- "_note": "Sanitized display fixture extracted from a captured read-only product inspection. Not a live feed. No identifiers, no auth metadata.",
+ "_note": "Sanitized display fixture from a captured read-only product inspection. Not a live feed. No identifiers, no auth metadata.",
  "capture": {
   "kind": "captured_product_demonstration",
   "whale_watch": {
@@ -10,7 +10,8 @@
   "projections": {
    "source_computation_time": null,
    "collected_at": "2026-09-15T02:44:42Z"
-  }
+  },
+  "gap_between_panels": "2 min 42 s"
  },
  "league": "NFL",
  "matchup": {
@@ -23,7 +24,7 @@
    "name": "Buffalo Bills",
    "abbr": "BUF"
   },
-  "kickoff": "2026-09-18T00:15:00+00:00"
+  "kickoff_utc": "2026-09-18T00:15:00+00:00"
  },
  "projections": {
   "away_score": 25.6124267578125,
@@ -37,8 +38,14 @@
   "type": "NFL Spread",
   "selection": "Buffalo Bills -4.5",
   "line_value": -4.5,
-  "best_ask_american": -102,
-  "best_bid_american": -100,
+  "best_ask": {
+   "american": -102,
+   "venue": "ProphetX"
+  },
+  "best_bid": {
+   "american": -100,
+   "venue": "Kalshi"
+  },
   "standing_bid_liquidity_usd": 325181.8,
   "venues": [
    "Kalshi",
@@ -50,7 +57,7 @@
  },
  "derived": {
   "liquidity_weighted_avg_bid_american": 160,
-  "formula": "sum(price * liquidity) / sum(liquidity)",
+  "formula": "sum(price x liquidity) / sum(liquidity)",
   "computed_by": "client-side"
  }
 }

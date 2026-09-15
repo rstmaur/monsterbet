@@ -569,7 +569,7 @@ img{max-width:100%; height:auto; display:block}
 <div class="snap-hd">
 <div><span class="snap-kick">NFL · Spread</span>
 <h3 id="snapH">NFL Market Snapshot</h3></div>
-<span class="snap-cap">Static example · captured 15 Sep 2026</span>
+<span class="snap-cap">Static example</span>
 </div>
 
 <div class="snap-match">
@@ -578,9 +578,8 @@ img{max-width:100%; height:auto; display:block}
 <div class="snap-kickoff">Kickoff Thu 17 Sep 2026 · 8:15 PM ET <span>(18 Sep · 00:15 UTC)</span></div>
 </div>
 
-<p class="snap-flag"><b>Nothing here is a betting opportunity.</b> Monster.bet
-itself flags this record as one you should not act on, and these numbers are
-frozen from 15 Sep 2026 — they are not updating.</p>
+<p class="snap-flag"><b>Product example · captured 15 Sep 2026.</b> Prices are
+not current. Not a betting recommendation.</p>
 <div class="snap-grid">
 
 <div class="snap-panel">
@@ -635,6 +634,11 @@ computation time at all, so only our collection time is known.</p>
 Computed by us as sum(price x liquidity) / sum(liquidity) across the three venues. No venue quotes this
 price; it is a summary statistic, kept out of the main view because it is easy
 to mistake for a tradable number.</p>
+<p><b>Field we do not interpret: <code>quality.actionable = false</code>.</b>
+The record carries this value. Monster.bet publishes no definition for it, and
+none appears in the product interface, so we report the value and draw no
+conclusion from it — in particular we do not claim the provider is warning
+against acting on this record.</p>
 <p><b>Provenance.</b> Read-only authenticated inspection of the Monster.bet
 product interface. Only display fields were extracted; no identifiers or
 credentials are present in this page.</p>

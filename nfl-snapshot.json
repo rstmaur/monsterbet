@@ -53,7 +53,8 @@
    "ProphetX"
   ],
   "actionable": false,
-  "consumer_signal": "standing_orderbook_liquidity"
+  "consumer_signal": "standing_orderbook_liquidity",
+  "actionable_note": "Field value reported as-is. Provider publishes no definition; we draw no conclusion from it."
  },
  "derived": {
   "liquidity_weighted_avg_bid_american": 160,

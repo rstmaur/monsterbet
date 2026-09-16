@@ -278,6 +278,17 @@ img{max-width:100%; height:auto; display:block}
 .age{display:inline-block; border:1px solid #2A4064; color:#A9BCD6; border-radius:5px;
   padding:1px 6px; font-weight:700; font-size:11.5px; margin-left:6px}
 
+/* ── affiliate disclosure bar ──────────────────────────────────────────── */
+.affil{background:#0B1A33; border-bottom:1px solid rgba(255,255,255,.08);
+  color:#93A7C4; font-size:12.5px; line-height:1.5; padding:8px 0}
+.affil strong{color:#C6D4E7}
+
+/* ── footer links ──────────────────────────────────────────────────────── */
+.foot-links{margin-top:16px; padding-top:14px; border-top:1px solid #16294a;
+  display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center}
+.foot-links a{color:#A9BCD6; text-decoration:underline; text-underline-offset:2px}
+.foot-links a:hover{color:#fff}
+
 /* ── sticky CTA ────────────────────────────────────────────────────────── */
 .sticky-cta{position:fixed; left:0; right:0; bottom:0; z-index:40; display:none;
   align-items:center; gap:12px; padding:10px 14px calc(10px + env(safe-area-inset-bottom));
@@ -418,6 +429,14 @@ img{max-width:100%; height:auto; display:block}
 <span class="nav-fee">+ 5% Whop service fee</span>
 </div>
 </div></header>
+
+<div class="affil"><div class="wrap">
+<p><strong>Affiliate disclosure:</strong> this site is operated by Xentraffic, an
+independent affiliate of Monster.bet. We are not Monster.bet and we do not
+operate the MonsterGPT service. Subscriptions are sold and billed by Monster.bet
+through Whop, and we earn a commission on subscriptions started from the links
+on this page. That commission does not change the price you pay.</p>
+</div></div>
 
 <main id="top">
 
@@ -716,7 +735,29 @@ credentials are present in this page.</p>
 <p><strong>Pricing:</strong> $27 / week, $77 / month, $770 / year. Whop adds a 5% service fee, making the totals $28.35, $80.85 and $808.50. Cancel anytime in your Whop account; access runs to the end of the paid period.</p>
 <p><strong>Product demonstration:</strong> every MonsterGPT screen and conversation shown above is an illustrative product demonstration. Fort Union and Bay Harbor are fictional clubs, and every figure, injury, snap share, line and price is an example of the format — not live data, not a real game and not a prediction.</p>
 <p><strong>Independent product:</strong> Monster.bet is not affiliated with, endorsed by or sponsored by the NFL, any team, any player or any sportsbook. No league, team or sportsbook trademarks appear on this site; all football imagery is original artwork depicting fictional athletes in unbranded uniforms.</p>
-<p><strong>Responsible use:</strong> MonsterGPT provides research and context only. It does not accept or place wagers, sell picks, guarantee outcomes or give financial advice. 18+; know your local laws, risk only what you can afford to lose, and play responsibly.</p>
+<p><strong>Affiliate relationship:</strong> Xentraffic operates this site as an
+independent affiliate of Monster.bet and is paid a commission on subscriptions
+started here. Monster.bet is the seller of record; Whop processes the payment.
+We do not set the price, control the product or handle your subscription — all
+billing, access and cancellation questions go to Monster.bet through your Whop
+account.</p>
+<p><strong>Responsible use:</strong> MonsterGPT provides research and context only.
+It does not accept or place wagers, sell picks, guarantee outcomes or give financial
+advice. Intended for adults 18+, and 21+ in United States jurisdictions where that
+is the legal age for sports wagering. Know your local laws, risk only what you can
+afford to lose, and play responsibly.</p>
+<p><strong>If gambling stops being fun:</strong> help is free, confidential and
+available 24/7. United States — National Problem Gambling Helpline,
+<a href="tel:18004262537">1-800-522-4700</a> or
+<a href="https://www.ncpgambling.org/help-treatment/" target="_blank" rel="noopener nofollow">ncpgambling.org</a>.
+Canada — <a href="https://www.problemgambling.ca/" target="_blank" rel="noopener nofollow">problemgambling.ca</a>.
+Elsewhere, contact your national problem-gambling service.</p>
+<div class="foot-links">
+<a href="/terms.html">Terms of use</a>
+<a href="/privacy.html">Privacy policy</a>
+<a href="/terms.html#affiliate">Affiliate disclosure</a>
+<a href="mailto:contact@monsterbet.ai">Contact</a>
+</div>
 </div></footer>
 
 </main>
@@ -811,9 +852,9 @@ credentials are present in this page.</p>
   'use strict';
   var GA='G-5VBBKZWLYL', enabled=/^G-[A-Z0-9]+$/i.test(GA), query=new URLSearchParams(location.search), ref='(direct)';
   try{if(document.referrer)ref=new URL(document.referrer).origin}catch(e){}
-  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',referrer:ref};
+  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',utm_term:query.get('utm_term')||'(not set)',click_id:query.get('gclid')||query.get('gbraid')||query.get('wbraid')||'(none)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
-  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content'];
+  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid'];
   /* Every CTA on the page resolves to a real section; the fallback exists
      only so a future CTA cannot report an empty location. */
   function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('#demo')?'product_demo':a.closest('.final')?'final_cta':'other'}

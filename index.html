@@ -15,18 +15,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap">
-<link rel="preload" as="image" href="/assets/hero-mobile.webp" media="(max-width:800px)">
-<link rel="preload" as="image" href="/assets/hero-desktop.webp" media="(min-width:801px)">
+<link rel="preload" as="image" href="/assets/nfl-stadium-mobile.webp" media="(max-width:800px)">
+<link rel="preload" as="image" href="/assets/nfl-stadium-desktop.webp" media="(min-width:801px)">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
-   Monster.bet — mobile-first NFL pre-lander.
+   Monster.bet — NFL pre-lander.
 
-   One job: move paid traffic to the MonsterGPT checkout. Short sections,
-   strong visual rhythm, a real football creative in the first viewport on
-   every screen size, and no wall of text anywhere.
+   Rhythm is deliberate and alternates so the page never reads as one long
+   slab: dark hero → light product demonstration → dark stadium band
+   (benefits + verified intelligence) → light pricing → dark final CTA.
 
-   #nflIntel renders only if the intelligence file carries verified matchups,
-   and is silent otherwise — never an empty state, never a "coming soon".
+   #nflIntel renders only when the intelligence file carries complete verified
+   signals, and is silent otherwise — never an empty state, never a
+   "coming soon".
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root{
@@ -36,7 +37,7 @@
   --navy:#0B1B33; --mid:#4A5C77; --soft:#6C7E99;
   --green:#0F9D52; --green-dk:#0B7D40; --green-lt:#E8F7EF; --green-br:#14C46A;
   --amber:#E07B12; --amber-lt:#FEF3E4;
-  --purple:#6B4DE6;
+  --purple:#6B4DE6; --purple-lt:#C3B5FB;
   --shadow-sm:0 1px 2px rgba(11,27,51,.07);
   --shadow:0 1px 3px rgba(11,27,51,.08), 0 10px 28px -20px rgba(11,27,51,.45);
   --shadow-lg:0 2px 6px rgba(8,21,43,.10), 0 28px 60px -34px rgba(8,21,43,.55);
@@ -50,282 +51,374 @@ body{margin:0; background:var(--white); color:var(--navy); font-family:var(--txt
 h1,h2,h3,h4,.ui{font-family:var(--ui); letter-spacing:-.022em; margin:0; text-wrap:balance}
 p{margin:0} ul,ol{margin:0; padding:0; list-style:none}
 a{color:inherit; text-decoration:none}
-img{max-width:100%; display:block}
-:focus-visible{outline:2px solid var(--green); outline-offset:2px; border-radius:4px}
+img{max-width:100%; height:auto; display:block}
+:focus-visible{outline:2px solid var(--green-br); outline-offset:2px; border-radius:4px}
 .wrap{max-width:1120px; margin:0 auto; padding-left:18px; padding-right:18px}
 .hidden{display:none !important}
 
 /* ── buttons ───────────────────────────────────────────────────────────── */
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px;
   font-family:var(--ui); font-weight:800; font-size:16px; padding:15px 26px;
-  border-radius:10px; transition:transform .12s, box-shadow .12s}
-.btn-primary{background:linear-gradient(180deg,var(--green-br),var(--green)); color:#fff;
-  box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 8px 20px -10px rgba(15,157,82,.85)}
-.btn-primary:hover{transform:translateY(-1px)}
-.btn-lg{font-size:17.5px; padding:17px 30px}
-.fee{font-size:12.5px; color:var(--soft)}
+  border-radius:11px; border:1px solid transparent; cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease}
+.btn-primary{background:var(--green); color:#fff; box-shadow:0 1px 2px rgba(11,125,64,.3), 0 12px 26px -14px rgba(15,157,82,.85)}
+.btn-primary:hover{background:var(--green-dk); transform:translateY(-1px)}
+.btn-lg{font-size:17.5px; padding:18px 32px; border-radius:12px}
+.btn-glow{background:var(--green-br); color:#052E1A;
+  box-shadow:0 0 0 1px rgba(20,196,106,.5), 0 14px 34px -12px rgba(20,196,106,.6)}
+.btn-glow:hover{background:#0FB55F; color:#04240F; transform:translateY(-1px)}
 
-/* ── header: logo + CTA + fee only, no nav ─────────────────────────────── */
-.topbar{position:sticky; top:0; z-index:70; background:rgba(255,255,255,.95);
-  backdrop-filter:saturate(150%) blur(10px); border-bottom:1px solid var(--line)}
-.topbar .wrap{display:flex; align-items:center; gap:12px; min-height:56px}
-.brand{display:inline-flex; align-items:center; gap:8px; flex:none;
-  font-family:var(--ui); font-weight:900; font-size:17px; letter-spacing:-.03em}
-.brand .wm{display:inline-flex}
-.brand b{color:var(--green)}
-.nav-buy{display:flex; flex-direction:column; align-items:flex-end; gap:2px; margin-left:auto}
-.nav-buy .btn{padding:10px 17px; font-size:14px; border-radius:8px}
-.nav-fee{font-size:10.5px; color:var(--soft)}
+/* ── topbar ────────────────────────────────────────────────────────────── */
+.topbar{background:var(--ink); border-bottom:1px solid rgba(255,255,255,.08);
+  position:relative; z-index:6}
+.topbar .wrap{display:flex; align-items:center; gap:14px; height:62px}
+.brand{display:flex; align-items:center; gap:9px}
+.wm{font-family:var(--ui); font-weight:900; font-size:17px; color:#fff;
+  letter-spacing:-.035em}
+.wm b{color:var(--green-br); font-weight:900}
+.nav-buy{margin-left:auto; display:flex; align-items:center; gap:12px}
+.nav-fee{font-size:12px; color:#8FA3C0; font-weight:600}
+.topbar .btn{padding:10px 18px; font-size:14.5px; border-radius:9px}
 
-/* ── hero ──────────────────────────────────────────────────────────────── */
-.hero{position:relative; background:var(--ink); overflow:hidden; isolation:isolate}
-.hero-photo{position:absolute; inset:0; z-index:0}
-.hero-photo img{width:100%; height:100%; object-fit:cover; object-position:50% 38%}
-.hero-scrim{position:absolute; inset:0; z-index:1; background:
-  linear-gradient(100deg, rgba(6,15,32,.96) 0%, rgba(6,15,32,.90) 32%, rgba(6,15,32,.55) 54%, rgba(6,15,32,.30) 74%, rgba(6,15,32,.50) 100%),
-  linear-gradient(180deg, rgba(6,15,32,.50) 0%, rgba(6,15,32,0) 24%, rgba(6,15,32,.80) 100%)}
-.hero .wrap{position:relative; z-index:2; padding-block:52px 44px; max-width:1120px}
-.hero-copy{max-width:600px}
-.eyebrow{display:inline-flex; align-items:center; gap:8px; font-family:var(--ui);
-  font-weight:700; font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:#A9C0DF}
-.eyebrow .pill{font-style:normal; background:rgba(107,77,230,.26);
-  border:1px solid rgba(150,127,246,.45); color:#CFC3FF; padding:3px 9px; border-radius:99px}
-.hero h1{color:#fff; font-weight:900; font-size:clamp(32px,5.2vw,56px); line-height:1.02;
-  letter-spacing:-.034em; margin-top:14px}
-.hero h1 em{font-style:normal; color:var(--green-br)}
-.hero-sub{color:#C6D6EA; font-size:clamp(15.5px,1.7vw,18px); line-height:1.5; margin-top:14px; max-width:520px}
-.hero-pts{display:flex; flex-direction:column; gap:9px; margin-top:20px}
-.hero-pts li{display:flex; align-items:flex-start; gap:10px; color:#DCE7F5; font-size:15.5px; line-height:1.4}
-.hero-pts svg{flex:none; margin-top:3px; color:var(--green-br)}
-.hero-pts b{color:#fff; font-weight:700}
-.hero-cta{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:24px}
-.hero-meta{display:flex; gap:6px 16px; flex-wrap:wrap; margin-top:12px; font-size:12.5px; color:#9DB2CE}
-.hero-meta span{display:inline-flex; align-items:center; gap:6px}
-.hero-meta svg{color:var(--green-br); flex:none}
-
-/* ── section furniture ─────────────────────────────────────────────────── */
-.sec{padding-block:46px}
-.sec.grey{background:var(--grey); border-block:1px solid var(--line)}
+/* ── section shells ────────────────────────────────────────────────────── */
+.sec{padding:58px 0}
+.sec-lt{background:var(--white)}
+.sec-gr{background:var(--grey)}
+.sec-dk{background:var(--ink); color:#fff}
 .kicker{display:inline-flex; align-items:center; gap:7px; font-family:var(--ui);
-  font-weight:800; font-size:11px; letter-spacing:.10em; text-transform:uppercase; color:var(--green-dk)}
-.kicker::before{content:""; width:15px; height:2px; background:var(--green); border-radius:2px}
-.sec-head{max-width:680px; margin-bottom:22px}
-.sec-head h2{font-size:clamp(23px,3vw,32px); font-weight:800; line-height:1.13; margin-top:8px}
-.sec-head p{color:var(--mid); font-size:15.5px; margin-top:7px}
+  font-weight:800; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--green-dk)}
+.sec-dk .kicker{color:var(--green-br)}
+.sec-head{text-align:center; max-width:660px; margin:0 auto 30px}
+.sec-head h2{font-size:clamp(27px,4.1vw,40px); font-weight:900; line-height:1.1;
+  margin-top:9px}
+.sec-head p{margin-top:12px; color:var(--mid); font-size:16.5px}
+.sec-dk .sec-head p{color:#A9BCD6}
 
-/* ── intelligence module (hidden unless verified matchups exist) ───────── */
-#nflIntel[hidden]{display:none !important}
-.xa-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px}
-.xa-fresh{display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--soft);
-  font-variant-numeric:tabular-nums; margin-left:auto}
-.xa-dot{width:7px; height:7px; border-radius:50%; background:var(--green-br); flex:none}
-.xa-list{display:grid; gap:10px}
-.xa-row{display:grid; grid-template-columns:1fr auto; gap:10px 16px; align-items:center;
-  background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+/* ── 1 · DARK HERO ─────────────────────────────────────────────────────── */
+.hero{position:relative; background:var(--ink); color:#fff; overflow:hidden;
+  isolation:isolate}
+.hero-bg{position:absolute; inset:0; z-index:-2}
+.hero-bg img{width:100%; height:100%; object-fit:cover}
+.hero-scrim{position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(180deg, rgba(8,21,43,.50) 0%, rgba(8,21,43,.68) 48%, rgba(8,21,43,.93) 100%)}
+@media (min-width:801px){
+  /* text sits left, so darken that side and let the stadium read on the right */
+  .hero-scrim{background:
+    linear-gradient(90deg, rgba(8,21,43,.94) 0%, rgba(8,21,43,.80) 44%, rgba(8,21,43,.46) 100%),
+    linear-gradient(180deg, rgba(8,21,43,.30) 0%, rgba(8,21,43,.55) 60%, rgba(8,21,43,.88) 100%)}
+}
+.hero .wrap{position:relative; padding-top:52px; padding-bottom:46px;
+  display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center}
+.hero-tag{display:inline-flex; align-items:center; gap:8px; font-family:var(--ui);
+  font-weight:800; font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--green-br); background:rgba(20,196,106,.12);
+  border:1px solid rgba(20,196,106,.34); padding:7px 13px; border-radius:999px}
+.hero h1{font-size:clamp(36px,5.6vw,60px); font-weight:900; line-height:1.02;
+  margin-top:18px; letter-spacing:-.035em}
+.hero h1 em{font-style:normal; color:var(--green-br)}
+.hero-sub{margin-top:16px; font-size:17.5px; color:#C6D4E7; max-width:30em}
+.hero-ul{margin-top:22px; display:flex; flex-direction:column; gap:11px}
+.hero-ul li{display:flex; align-items:flex-start; gap:11px; font-size:16px;
+  color:#DCE6F3; font-weight:500}
+.hero-ul .tick{width:21px; height:21px; flex:none; border-radius:6px;
+  background:rgba(20,196,106,.16); border:1px solid rgba(20,196,106,.4);
+  display:grid; place-items:center; margin-top:1px}
+.hero-cta{margin-top:28px; display:flex; flex-wrap:wrap; align-items:center; gap:14px}
+.hero-meta{margin-top:12px; font-size:13.5px; color:#8FA3C0; font-weight:600}
+
+/* device mockups */
+.rig{position:relative; padding-bottom:34px}
+.laptop{position:relative; filter:drop-shadow(0 30px 60px rgba(0,0,0,.55))}
+.laptop-screen{background:#0B1B33; border:9px solid #1A2B48; border-radius:14px;
+  overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.laptop-screen img{width:100%; display:block}
+.laptop-base{height:13px; margin:0 -7%; border-radius:0 0 13px 13px;
+  background:linear-gradient(180deg,#1A2B48 0%,#121F36 100%);
+  box-shadow:0 10px 22px -10px rgba(0,0,0,.7); position:relative}
+.laptop-base::after{content:""; position:absolute; top:0; left:50%;
+  transform:translateX(-50%); width:15%; height:5px; border-radius:0 0 6px 6px;
+  background:#0B1526}
+.phone{position:absolute; right:-10px; bottom:30px; width:26%;
+  border:7px solid #1A2B48; border-radius:22px; overflow:hidden; background:#0B1B33;
+  box-shadow:0 22px 44px -14px rgba(0,0,0,.75), inset 0 0 0 1px rgba(255,255,255,.07)}
+.phone img{width:100%; display:block}
+.phone::before{content:""; position:absolute; top:6px; left:50%;
+  transform:translateX(-50%); width:34%; height:5px; border-radius:99px;
+  background:#0B1526; z-index:2}
+.rig-note{position:relative; z-index:3; margin-top:14px; padding-right:29%;
+  font-size:12px; color:#8399B8; font-weight:600}
+
+/* ── 2 · LIGHT PRODUCT DEMONSTRATION ───────────────────────────────────── */
+.demo-note{display:flex; align-items:center; justify-content:center; gap:9px;
+  margin:0 auto 22px; max-width:640px; background:#F2EEFE;
+  border:1px solid #DCD2FB; color:#4B3AA8; border-radius:10px; padding:11px 15px;
+  font-size:13.5px; font-weight:700; text-align:center}
+.chat{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:14px}
+.ask{align-self:flex-end; max-width:86%; background:var(--ink); color:#fff;
+  padding:14px 18px; border-radius:15px 15px 5px 15px; font-size:16px;
+  font-weight:500; box-shadow:var(--shadow)}
+.ans{background:#fff; border:1px solid var(--line); border-radius:15px 15px 15px 5px;
+  padding:20px 21px; box-shadow:var(--shadow)}
+.ans-hd{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+.ans-av{width:30px; height:30px; border-radius:9px; flex:none; display:grid;
+  place-items:center; background:linear-gradient(150deg,#7C5CF0,#4A31B8); color:#fff;
+  font-family:var(--ui); font-weight:900; font-size:13px}
+.ans-hd b{font-family:var(--ui); font-weight:800; font-size:15px}
+.ans-rows{display:flex; flex-direction:column; gap:10px}
+.arow{display:flex; gap:13px; align-items:flex-start; padding:11px 13px;
+  background:var(--grey); border-radius:10px; border:1px solid var(--grey-2)}
+.arow .lbl{font-family:var(--ui); font-weight:800; font-size:10.5px;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--soft); flex:none;
+  width:94px; padding-top:3px}
+.arow p{font-size:15px; color:#26364F}
+.arow b{font-weight:700; color:var(--navy)}
+.mvup{display:inline-flex; align-items:center; gap:4px; background:var(--green-lt);
+  border:1px solid #B6E6CC; color:var(--green-dk); padding:1px 7px; border-radius:5px;
+  font-family:var(--ui); font-weight:800; font-size:12.5px; vertical-align:1px}
+.ans-ft{margin-top:14px; padding-top:13px; border-top:1px dashed var(--line);
+  font-size:12.5px; color:var(--soft); font-weight:600}
+
+/* ── 3 · DARK STADIUM BAND (benefits + intelligence) ───────────────────── */
+.band{position:relative; background:var(--ink); color:#fff; overflow:hidden;
+  isolation:isolate}
+.band-bg{position:absolute; inset:0; z-index:-2}
+.band-bg img{width:100%; height:100%; object-fit:cover}
+.band-scrim{position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(180deg, rgba(8,21,43,.90) 0%, rgba(8,21,43,.78) 32%, rgba(8,21,43,.96) 100%)}
+.band .wrap{position:relative; padding-top:58px; padding-bottom:58px}
+.feats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+.feat{background:rgba(14,34,66,.82); border:1px solid rgba(255,255,255,.11);
+  border-radius:14px; overflow:hidden; backdrop-filter:blur(3px)}
+.feat-img{height:138px; overflow:hidden; position:relative}
+.feat-img img{width:100%; height:100%; object-fit:cover; opacity:1}
+.feat-img::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(8,21,43,0) 0%,rgba(8,21,43,.10) 46%,
+    rgba(14,34,66,.90) 100%)}
+.feat-ic{position:absolute; left:13px; bottom:11px; z-index:2; width:32px; height:32px;
+  border-radius:9px; background:rgba(20,196,106,.17);
+  border:1px solid rgba(20,196,106,.45); display:grid; place-items:center;
+  color:var(--green-br)}
+.feat-b{padding:14px 15px 17px}
+.feat-b h3{font-size:16.5px; font-weight:800}
+.feat-b p{margin-top:6px; font-size:14px; color:#A9BCD6; line-height:1.45}
+
+/* verified intelligence strip */
+.intel{margin-top:34px; background:rgba(11,27,51,.9);
+  border:1px solid rgba(255,255,255,.13); border-radius:15px; padding:20px 20px 18px}
+.intel-hd{display:flex; align-items:center; gap:11px; flex-wrap:wrap;
+  margin-bottom:15px}
+.intel-hd h3{font-size:18px; font-weight:800}
+.live{display:inline-flex; align-items:center; gap:6px; font-family:var(--ui);
+  font-weight:800; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--green-br); background:rgba(20,196,106,.14);
+  border:1px solid rgba(20,196,106,.38); padding:5px 10px; border-radius:999px}
+.live i{width:7px; height:7px; border-radius:50%; background:var(--green-br);
+  display:block}
+.intel-fresh{margin-left:auto; font-size:12.5px; color:#8FA3C0; font-weight:600}
+.sigs{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.sig{background:rgba(14,34,66,.9); border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:15px 16px}
+.sig-m{font-family:var(--ui); font-weight:800; font-size:16px}
+.sig-b{margin-top:5px; font-size:13px; color:#8FA3C0; font-weight:600}
+.sig-p{margin-top:12px; display:flex; align-items:center; gap:9px}
+.sig-p .o{font-family:var(--ui); font-weight:800; font-size:19px; color:#8FA3C0}
+.sig-p .c{font-family:var(--ui); font-weight:800; font-size:19px; color:#fff}
+.sig-p .ar{color:#63779A; font-size:15px}
+/* Line movement is directional, not good/bad — never colour it like a win. */
+.sigmv{display:inline-flex; align-items:center; gap:4px;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.18);
+  color:#C6D4E7; padding:2px 8px; border-radius:6px; font-family:var(--ui);
+  font-weight:800; font-size:13px}
+.sig-cta{margin-top:13px; display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--ui); font-weight:800; font-size:13.5px; color:var(--green-br)}
+
+/* ── 4 · LIGHT PRICING ─────────────────────────────────────────────────── */
+.plans{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:stretch}
+.plan{position:relative; background:#fff; border:1px solid var(--line);
+  border-radius:15px; padding:24px 20px 20px; display:flex; flex-direction:column;
   box-shadow:var(--shadow-sm)}
-.xa-match{font-family:var(--ui); font-weight:800; font-size:15.5px}
-.xa-when{font-size:12.5px; color:var(--soft); margin-top:2px}
-.xa-sigs{display:flex; gap:7px; flex-wrap:wrap; margin-top:8px}
-.xa-sig{display:inline-flex; align-items:center; gap:6px; font-size:12.5px;
-  border:1px solid var(--line); border-radius:7px; padding:4px 9px; background:var(--grey)}
-.xa-sig b{font-family:var(--ui); font-weight:800; font-variant-numeric:tabular-nums}
-.xa-sig.up b{color:var(--green-dk)} .xa-sig.dn b{color:#C3372E}
-.xa-cta{font-family:var(--ui); font-weight:800; font-size:13.5px; color:var(--green-dk);
-  border:1px solid #BFE7D1; background:var(--green-lt); padding:10px 14px; border-radius:9px; white-space:nowrap}
-.xa-src{font-size:11.5px; color:var(--soft); margin-top:10px}
+.plan.best{border-color:var(--green); box-shadow:0 0 0 2px rgba(15,157,82,.16), var(--shadow)}
+.flag{position:absolute; top:-11px; left:20px; font-family:var(--ui); font-weight:800;
+  font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#fff;
+  background:var(--green); padding:5px 11px; border-radius:6px}
+.save-flag{background:var(--ink)}
+.plan h3{font-size:17px; font-weight:800; color:var(--mid)}
+.amt{margin-top:9px; display:flex; align-items:baseline; gap:6px}
+.amt b{font-family:var(--ui); font-weight:900; font-size:38px; letter-spacing:-.04em}
+.amt span{color:var(--soft); font-weight:600; font-size:15px}
+.per{margin-top:4px; font-size:13.5px; color:var(--soft); font-weight:600}
+.save{margin-top:11px; font-size:14.5px; color:#26364F}
+.spacer{flex:1; min-height:16px}
+.plan .btn{width:100%}
+.total{margin-top:9px; font-size:12.5px; color:var(--soft); text-align:center;
+  font-weight:600}
+.price-foot{margin-top:18px; display:flex; flex-wrap:wrap; justify-content:center;
+  gap:8px 26px; font-size:13px; color:var(--mid)}
+.price-foot strong{color:var(--navy)}
 
-/* ── product demonstration ─────────────────────────────────────────────── */
-.demo-label{display:inline-flex; align-items:center; gap:7px; background:var(--amber-lt);
-  border:1px solid #F3D3A4; color:#8A4E05; font-family:var(--ui); font-weight:800;
-  font-size:11px; letter-spacing:.05em; text-transform:uppercase; padding:7px 12px; border-radius:8px}
-.demo-label i{width:6px; height:6px; border-radius:50%; background:var(--amber); flex:none}
-.chat{background:var(--white); border:1px solid var(--line); border-radius:14px;
-  box-shadow:var(--shadow-lg); overflow:hidden; margin-top:16px}
-.chat-bar{display:flex; align-items:center; gap:10px; padding:10px 15px;
-  background:linear-gradient(180deg,var(--ink-2),var(--ink)); color:#fff}
-.chat-bar .nm{font-family:var(--ui); font-weight:800; font-size:13px}
-.chat-bar .nm b{color:var(--green-br)}
-.chat-bar .tag{margin-left:auto; font-family:var(--ui); font-weight:700; font-size:9.5px;
-  letter-spacing:.07em; text-transform:uppercase; color:#A9C0DF;
-  border:1px solid rgba(169,192,223,.34); padding:3px 8px; border-radius:99px}
-.chat-body{padding:16px}
-.msg{margin-bottom:14px}
-.msg:last-child{margin-bottom:0}
-.av{display:inline-grid; place-items:center; height:21px; padding:0 7px; border-radius:6px;
-  font-family:var(--ui); font-weight:900; font-size:9px; letter-spacing:.02em; margin-bottom:7px}
-.msg.you .av{background:var(--grey-2); color:var(--mid); border:1px solid var(--line)}
-.msg.bot .av{background:linear-gradient(180deg,#1CD277,var(--green)); color:#fff}
-.q{background:var(--ink); color:#E4EDF9; border-radius:11px; padding:11px 14px;
-  font-size:15px; font-weight:500; display:inline-block}
-.ans{border:1px solid var(--line); border-radius:11px; background:var(--white); overflow:hidden}
-.ans-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap; padding:9px 14px;
-  background:var(--grey); border-bottom:1px solid var(--line)}
-.ans-top .mt{font-family:var(--ui); font-weight:800; font-size:12.5px}
-.ans-top .ex{margin-left:auto; font-family:var(--ui); font-weight:800; font-size:9px;
-  letter-spacing:.06em; text-transform:uppercase; color:#8A4E05; background:var(--amber-lt);
-  border:1px solid #F3D3A4; padding:3px 7px; border-radius:99px}
-.ans-body{padding:14px}
-.tldr{background:var(--green-lt); border:1px solid #BFE7D1; border-left:3px solid var(--green);
-  border-radius:7px; padding:10px 12px; font-size:14.5px; color:#0A3B25; margin-bottom:12px}
-.tldr b{font-family:var(--ui); font-weight:800}
-.blk{margin-bottom:11px}
-.blk:last-child{margin-bottom:0}
-.blk h4{font-family:var(--ui); font-weight:800; font-size:10.5px; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--soft); margin-bottom:5px}
-.blk p{font-size:14px; line-height:1.5; color:#25364F}
-.blk p b{color:var(--navy); font-weight:700}
-.demo-note{display:flex; gap:9px; align-items:flex-start; margin-top:12px;
-  font-size:12px; color:var(--soft); line-height:1.45}
-.demo-note svg{flex:none; margin-top:2px; color:var(--amber)}
-
-/* ── visual benefit strip ──────────────────────────────────────────────── */
-.strip{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
-.sb{background:var(--white); border:1px solid var(--line); border-radius:13px;
-  padding:18px 16px; box-shadow:var(--shadow-sm); position:relative; overflow:hidden}
-.sb-i{width:40px; height:40px; border-radius:11px; display:grid; place-items:center;
-  background:linear-gradient(180deg,var(--green-lt),#DCF2E6); border:1px solid #C8E9D7;
-  color:var(--green-dk); margin-bottom:12px}
-.sb h3{font-size:15.5px; font-weight:800}
-.sb p{font-size:13.5px; color:var(--mid); line-height:1.45; margin-top:5px}
-.strip-art{margin-top:14px; border-radius:13px; overflow:hidden; border:1px solid var(--line);
-  position:relative; background:var(--ink)}
-.strip-art img{width:100%; height:150px; object-fit:cover; opacity:.92}
-.strip-art figcaption{position:absolute; left:0; right:0; bottom:0; padding:14px 16px;
-  background:linear-gradient(180deg,rgba(8,21,43,0),rgba(8,21,43,.86));
-  color:#DCE7F5; font-size:13px}
-.strip-art figcaption b{font-family:var(--ui); font-weight:800; color:#fff; display:block; font-size:14.5px}
-
-/* ── pricing ───────────────────────────────────────────────────────────── */
-.pricing{background:linear-gradient(180deg,var(--ink),#0A1B36); color:#fff; padding-block:48px}
-.pricing .kicker{color:#6FE8A8}
-.pricing .kicker::before{background:var(--green-br)}
-.pricing .sec-head h2{color:#fff}
-.pricing .sec-head p{color:#A9BDD6}
-.plans{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:stretch}
-.plan{background:rgba(255,255,255,.05); border:1px solid rgba(148,178,216,.22);
-  border-radius:13px; padding:18px 16px; display:flex; flex-direction:column; position:relative}
-.plan.best{background:var(--white); color:var(--navy); border-color:transparent;
-  box-shadow:0 2px 8px rgba(0,0,0,.28), 0 30px 60px -32px rgba(0,0,0,.9)}
-.plan .flag{position:absolute; top:-10px; left:16px; font-family:var(--ui); font-weight:800;
-  font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:#fff;
-  background:linear-gradient(180deg,var(--green-br),var(--green)); padding:4px 10px; border-radius:99px}
-.plan .save-flag{background:linear-gradient(180deg,#F5A23C,var(--amber))}
-.plan h3{font-family:var(--ui); font-weight:800; font-size:13px; letter-spacing:.04em;
-  text-transform:uppercase; color:#A9BDD6}
-.plan.best h3{color:var(--soft)}
-.plan .amt{display:flex; align-items:baseline; gap:5px; margin-top:7px}
-.plan .amt b{font-family:var(--ui); font-weight:900; font-size:34px; letter-spacing:-.035em;
-  line-height:1; font-variant-numeric:tabular-nums}
-.plan .amt span{font-size:13px; color:#A9BDD6}
-.plan.best .amt span{color:var(--mid)}
-.plan .per{font-size:12.5px; color:#8FA6C4; margin-top:5px}
-.plan.best .per{color:var(--soft)}
-.plan .save{margin-top:9px; font-size:12.5px; line-height:1.45; color:#BDEBD1;
-  font-variant-numeric:tabular-nums}
-.plan.best .save{color:var(--mid)}
-.plan .save b{font-family:var(--ui); font-weight:800; color:#fff}
-.plan.best .save b{color:var(--navy)}
-.plan .btn{width:100%; margin-top:auto; padding-top:13px; padding-bottom:13px; font-size:15px}
-.plan .spacer{flex:1 1 auto; min-height:12px}
-.plan .total{margin-top:7px; text-align:center; font-size:11.5px; color:#8FA6C4}
-.plan.best .total{color:var(--soft)}
-.price-foot{margin-top:16px; padding-top:14px; border-top:1px solid rgba(148,178,216,.20);
-  font-size:12.5px; color:#A9BDD6; display:flex; gap:8px 18px; flex-wrap:wrap}
-.price-foot strong{color:#fff; font-family:var(--ui); font-weight:700}
-
-/* ── FAQ ───────────────────────────────────────────────────────────────── */
-.faq{border:1px solid var(--line); border-radius:13px; overflow:hidden; background:var(--white)}
-details{border-bottom:1px solid var(--line)}
-details:last-child{border-bottom:none}
-summary{list-style:none; cursor:pointer; padding:14px 42px 14px 16px; position:relative;
-  font-family:var(--ui); font-weight:700; font-size:14.5px}
-summary::-webkit-details-marker{display:none}
-summary::after{content:""; position:absolute; right:16px; top:19px; width:7px; height:7px;
-  border-right:2px solid var(--soft); border-bottom:2px solid var(--soft);
-  transform:rotate(45deg); transition:transform .15s}
-details[open] summary::after{transform:rotate(-135deg); top:22px}
-details[open] summary{color:var(--green-dk)}
-details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5}
-
-/* ── final CTA + footer ────────────────────────────────────────────────── */
-.final{position:relative; background:var(--ink); color:#fff; overflow:hidden; isolation:isolate}
-.final-photo{position:absolute; inset:0; z-index:0}
-.final-photo img{width:100%; height:100%; object-fit:cover; object-position:50% 42%; opacity:.5}
-.final-scrim{position:absolute; inset:0; z-index:1;
-  background:linear-gradient(180deg,rgba(8,21,43,.86),rgba(8,21,43,.94))}
-.final .wrap{position:relative; z-index:2; text-align:center; padding-block:52px}
-.final h2{font-size:clamp(24px,3.4vw,36px); font-weight:900; letter-spacing:-.03em; line-height:1.08}
+/* ── 5 · DARK FINAL CTA ────────────────────────────────────────────────── */
+.final{position:relative; background:var(--ink); color:#fff; overflow:hidden;
+  isolation:isolate; text-align:center}
+.final-bg{position:absolute; inset:0; z-index:-2}
+.final-bg img{width:100%; height:100%; object-fit:cover}
+.final-scrim{position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(180deg, rgba(8,21,43,.90), rgba(8,21,43,.96))}
+.final .wrap{position:relative; padding-top:64px; padding-bottom:64px}
+.final h2{font-size:clamp(28px,4.6vw,44px); font-weight:900; line-height:1.05}
 .final h2 em{font-style:normal; color:var(--green-br)}
-.final p{color:#BDD0E6; font-size:15.5px; margin:12px auto 0; max-width:480px}
-.final .hero-cta{justify-content:center; margin-top:20px}
-.final .hero-meta{justify-content:center}
-.disclaimer{background:var(--grey); border-top:1px solid var(--line); padding-block:24px 34px}
-.disclaimer .wrap{display:grid; gap:9px; max-width:900px}
-.disclaimer p{font-size:12px; color:var(--soft); line-height:1.55}
-.disclaimer strong{color:var(--mid); font-family:var(--ui); font-weight:700}
-.age{font-family:var(--ui); font-weight:900; font-size:10.5px; border:1.5px solid var(--soft);
-  color:var(--soft); border-radius:99px; padding:2px 8px}
+.final p{margin-top:13px; color:#C6D4E7; font-size:17px}
+.final .hero-cta{justify-content:center}
 
-/* ── sticky CTA, revealed once the hero is passed ──────────────────────── */
-.sticky-cta{position:fixed; left:0; right:0; bottom:0; z-index:80; display:flex;
-  align-items:center; gap:12px; padding:9px 14px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(8,21,43,.97); backdrop-filter:blur(10px);
-  border-top:1px solid rgba(148,178,216,.22);
-  transform:translateY(110%); transition:transform .22s ease; visibility:hidden}
-.sticky-cta.show{transform:translateY(0); visibility:visible}
-.sticky-cta span{display:flex; flex-direction:column; color:#fff; font-family:var(--ui);
-  font-weight:800; font-size:13.5px; line-height:1.2; min-width:0}
-.sticky-cta small{font-family:var(--txt); font-weight:400; font-size:10.5px; color:#9DB2CE}
-.sticky-cta .btn{margin-left:auto; flex:none; padding:11px 20px; font-size:14.5px}
-@media (prefers-reduced-motion:reduce){.sticky-cta{transition:none}}
+/* ── footer ────────────────────────────────────────────────────────────── */
+.disclaimer{background:#061020; color:#7E92B0; padding:30px 0 38px; font-size:12.5px;
+  line-height:1.6}
+.disclaimer p+p{margin-top:9px}
+.disclaimer strong{color:#A9BCD6}
+.age{display:inline-block; border:1px solid #2A4064; color:#A9BCD6; border-radius:5px;
+  padding:1px 6px; font-weight:700; font-size:11.5px; margin-left:6px}
+
+/* ── affiliate disclosure bar ──────────────────────────────────────────── */
+.affil{background:#0B1A33; border-bottom:1px solid rgba(255,255,255,.08);
+  color:#93A7C4; font-size:12.5px; line-height:1.5; padding:8px 0}
+.affil strong{color:#C6D4E7}
+
+/* ── footer links ──────────────────────────────────────────────────────── */
+.foot-links{margin-top:16px; padding-top:14px; border-top:1px solid #16294a;
+  display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center}
+.foot-links a{color:#A9BCD6; text-decoration:underline; text-underline-offset:2px}
+.foot-links a:hover{color:#fff}
+
+/* ── sticky CTA ────────────────────────────────────────────────────────── */
+.sticky-cta{position:fixed; left:0; right:0; bottom:0; z-index:40; display:none;
+  align-items:center; gap:12px; padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(8,21,43,.97); border-top:1px solid rgba(255,255,255,.12);
+  transform:translateY(110%); transition:transform .22s ease}
+.sticky-cta.show{transform:translateY(0)}
+.sticky-cta span{font-family:var(--ui); font-weight:800; color:#fff; font-size:14.5px;
+  display:flex; flex-direction:column; line-height:1.25}
+.sticky-cta small{font-weight:600; font-size:11.5px; color:#8FA3C0;
+  font-family:var(--txt)}
+.sticky-cta .btn{margin-left:auto; padding:12px 20px; font-size:15px}
 
 /* ── responsive ────────────────────────────────────────────────────────── */
-@media (max-width:1000px){
-  .strip{grid-template-columns:repeat(2,1fr)}
+@media (max-width:980px){
+  .feats{grid-template-columns:repeat(2,1fr)}
+  .sigs{grid-template-columns:1fr}
 }
-@media (max-width:860px){
-  .plans{grid-template-columns:1fr; gap:18px}
-  .plan.best{order:-1}
-  .plan .btn{margin-top:14px}
-  .plan .spacer{display:none}
-}
-@media (max-width:780px){
-  body{font-size:15.5px; padding-bottom:68px}
-  .sec{padding-block:36px}
-  .hero .wrap{padding-block:30px 34px}
-  .hero-photo img{object-position:64% 28%}
-  .hero-scrim{background:
-    linear-gradient(180deg, rgba(6,15,32,.88) 0%, rgba(6,15,32,.66) 26%, rgba(6,15,32,.48) 48%, rgba(6,15,32,.86) 78%, rgba(6,15,32,.97) 100%),
-    linear-gradient(90deg, rgba(6,15,32,.62) 0%, rgba(6,15,32,.18) 58%, rgba(6,15,32,0) 100%)}
-  .hero h1{font-size:clamp(30px,8.4vw,44px); margin-top:11px}
-  .hero-sub{font-size:15px; margin-top:11px}
-  .hero-pts{margin-top:16px; gap:8px}
-  .hero-pts li{font-size:14.5px}
-  .hero-cta{margin-top:18px}
-  .hero-cta .btn{width:100%}
-  .hero-meta{margin-top:10px; font-size:12px}
-  .xa-row{grid-template-columns:1fr}
-  .xa-cta{width:100%; text-align:center}
-  .strip{grid-template-columns:1fr; gap:10px}
-  .sb{display:grid; grid-template-columns:40px 1fr; gap:0 13px; align-items:start; padding:14px}
-  .sb-i{margin-bottom:0; grid-row:span 2}
-  .sb p{margin-top:3px}
-  .strip-art img{height:132px}
-  .chat-body{padding:13px}
-  .topbar .wrap{min-height:52px; gap:8px}
-  .nav-buy .btn{padding:9px 12px; font-size:12.5px}
-  .nav-fee{font-size:9.5px}
-  .final .wrap{padding-block:40px}
-  .final .hero-cta .btn{width:100%}
-}
-@media (max-width:420px){
-  .wrap{padding-left:15px; padding-right:15px}
-  .brand{font-size:15px}
-  .nav-buy .btn{padding:9px 10px; font-size:11.5px}
+@media (max-width:800px){
+  .sec{padding:44px 0}
+  .hero .wrap{grid-template-columns:1fr; gap:28px; padding-top:34px; padding-bottom:40px}
+  .hero h1{font-size:clamp(32px,8.4vw,42px)}
+  .hero-sub{font-size:16.5px}
+  .hero .btn{width:100%}
+  .rig{padding-bottom:0}
+  .phone{position:relative; right:auto; bottom:auto; width:54%; margin:-13% auto 0}
+  .rig-note{padding-right:0; text-align:center; margin-top:16px}
+  .band .wrap{padding-top:44px; padding-bottom:44px}
+  /* horizontal swipeable benefit cards — no tall stack of text blocks */
+  .feats{display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch; margin:0 -18px; padding:2px 18px 12px;
+    scrollbar-width:none}
+  .feats::-webkit-scrollbar{display:none}
+  .feat{flex:0 0 76%; scroll-snap-align:start}
+  .feat-img{height:124px}
+  .plans{grid-template-columns:1fr; gap:20px}
+  .chat{gap:12px}
+  .ask{max-width:92%}
+  .arow{flex-direction:column; gap:5px}
+  .arow .lbl{width:auto; padding-top:0}
+  .sticky-cta{display:flex}
+  /* the fixed bar is 70px tall — reserve it so nothing is ever covered */
+  body{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+  .topbar .wrap{height:56px}
   .nav-fee{display:none}
-  .plan .amt b{font-size:31px}
+  .plan .amt b{font-size:34px}
   .btn{white-space:normal; text-align:center}
+  .sec-head{margin-bottom:24px}
 }
+@media (max-width:380px){
+  /* keep the laptop base bleed and the header CTA inside a 320px viewport */
+  .laptop-base{margin:0 -4%}
+  .topbar .btn{padding:10px 13px; font-size:13.5px}
+  .wm{font-size:15.5px}
+  .hero h1{font-size:clamp(28px,8.2vw,36px)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn{transition:none}
+  .sticky-cta{transition:none}
+}
+
+/* ── NFL Market Snapshot — captured, static product demonstration ──────── */
+.snap{margin-top:34px; background:rgba(11,27,51,.93);
+  border:1px solid rgba(255,255,255,.13); border-radius:16px; padding:20px}
+.snap-hd{display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.snap-kick{display:block; font-family:var(--ui); font-size:11px; font-weight:800;
+  letter-spacing:.09em; text-transform:uppercase; color:#14C46A; margin-bottom:3px}
+.snap-hd h3{font-size:19px; font-weight:800; color:#fff}
+.snap-cap{font-size:11.5px; font-weight:700; color:#F0B354;
+  border:1px solid rgba(240,179,84,.35); border-radius:999px; padding:5px 10px}
+.snap-match{border-top:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.1); padding:13px 0; margin-bottom:14px}
+.snap-teams{font-family:var(--ui); font-size:20px; font-weight:800; color:#fff;
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.snap-at{color:#63779A; font-size:14px; font-weight:700}
+.snap-kickoff{margin-top:5px; font-size:13.5px; color:#CBD8EA; font-weight:700}
+.snap-kickoff span{color:#63779A; font-weight:600; font-size:12.5px}
+.snap-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.snap-panel{background:rgba(14,34,66,.92); border:1px solid rgba(255,255,255,.1);
+  border-radius:13px; padding:15px}
+.snap-panel h4{font-size:13px; font-weight:800; color:#8FA3C0; margin-bottom:11px;
+  letter-spacing:.05em; text-transform:uppercase}
+.snap-scores{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+.snap-sc{background:rgba(255,255,255,.05); border-radius:9px; padding:9px 6px;
+  text-align:center}
+.snap-sc span{display:block; font-size:11.5px; color:#8FA3C0; font-weight:700}
+.snap-sc b{display:block; margin-top:2px; font-family:var(--ui); font-size:23px;
+  color:#fff; font-weight:800; line-height:1.1}
+.snap-win{background:rgba(20,196,106,.14); border:1px solid rgba(20,196,106,.3)}
+.snap-tot b{color:#CBD8EA; font-size:20px}
+.snap-margin{margin-top:11px; font-size:14px; color:#CBD8EA; font-weight:600}
+.snap-margin b{color:var(--green-br,#14C46A); font-family:var(--ui); font-weight:800}
+.snap-prob{margin-top:11px}
+.snap-pb{height:8px; border-radius:99px; background:rgba(255,255,255,.12); overflow:hidden}
+.snap-pb i{display:block; height:100%; background:var(--green-br,#14C46A)}
+.snap-pl{display:flex; justify-content:space-between; margin-top:5px;
+  font-size:12.5px; color:#CBD8EA; font-weight:700}
+.snap-sel{font-family:var(--ui); font-size:17px; font-weight:800; color:#fff;
+  margin-bottom:10px}
+.snap-rows{display:flex; flex-direction:column; gap:6px}
+.snap-r{display:grid; grid-template-columns:1fr auto auto; align-items:baseline;
+  gap:10px; padding:8px 10px; background:rgba(255,255,255,.05); border-radius:8px}
+.snap-r span{font-size:12.5px; color:#8FA3C0; font-weight:600}
+.snap-r b{font-family:var(--ui); font-size:16px; color:#fff; font-weight:800}
+.snap-r em{font-style:normal; font-size:11px; color:#63779A; font-weight:700;
+  min-width:62px; text-align:right}
+.snap-venues{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+.snap-venues span{font-size:11px; font-weight:700; color:#8FA3C0;
+  border:1px solid rgba(255,255,255,.16); border-radius:999px; padding:3px 9px}
+.snap-guard{margin-top:11px; font-size:12px; line-height:1.5; color:#8FA3C0}
+.snap-guard b{color:#CBD8EA}
+.snap-flag{margin:0 0 14px; padding:11px 13px; border-radius:10px;
+  background:rgba(240,179,84,.09); border:1px solid rgba(240,179,84,.3);
+  font-size:13px; line-height:1.5; color:#E6D2B0}
+.snap-flag b{color:#F0B354}
+.snap-more{margin-top:12px; border-top:1px solid rgba(255,255,255,.1); padding-top:11px}
+.snap-more summary{cursor:pointer; font-size:12.5px; font-weight:700;
+  color:#8FA3C0; list-style:revert}
+.snap-more summary:hover{color:#CBD8EA}
+.snap-more-b{margin-top:10px; display:flex; flex-direction:column; gap:9px}
+.snap-more-b p{font-size:12px; line-height:1.55; color:#8FA3C0}
+.snap-more-b b{color:#CBD8EA}
+@media(max-width:800px){
+  .snap-grid{grid-template-columns:1fr}
+  .snap-hd{flex-direction:column}
+  .snap-teams{font-size:18px}
+  .snap-r em{min-width:0}
+}
+
 </style>
 <body>
 
@@ -337,140 +430,245 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 </div>
 </div></header>
 
+<div class="affil"><div class="wrap">
+<p><strong>Affiliate disclosure:</strong> Xentraffic is an independent affiliate of
+Monster.bet, not Monster.bet itself. We earn a commission on subscriptions
+started here, and it does not change the price you pay.</p>
+</div></div>
+
 <main id="top">
 
-<!-- ═══ HERO ═══════════════════════════════════════════════════════════ -->
+<!-- ═══ 1 · DARK NFL HERO ══════════════════════════════════════════════ -->
 <section class="hero" id="hero">
-<picture class="hero-photo">
-<source type="image/webp" media="(max-width:800px)" srcset="/assets/hero-mobile.webp">
-<source type="image/jpeg" media="(max-width:800px)" srcset="/assets/hero-mobile.jpg">
-<source type="image/webp" srcset="/assets/hero-desktop.webp">
-<img src="/assets/hero-desktop.jpg" width="1536" height="864" alt="A football player in a plain unbranded green uniform running the ball under stadium floodlights at night." fetchpriority="high" decoding="async">
+<picture class="hero-bg">
+<source type="image/webp" media="(max-width:800px)" srcset="/assets/nfl-stadium-mobile.webp">
+<source type="image/jpeg" media="(max-width:800px)" srcset="/assets/nfl-stadium-mobile.jpg">
+<source type="image/webp" srcset="/assets/nfl-stadium-desktop.webp">
+<img src="/assets/nfl-stadium-desktop.jpg" width="1920" height="1080" alt="A floodlit American football stadium at night, seen from field level." fetchpriority="high" decoding="async">
 </picture>
 <div class="hero-scrim"></div>
-<div class="wrap"><div class="hero-copy">
-<span class="eyebrow">NFL 2026 <i class="pill">MonsterGPT</i></span>
-<h1>Know the matchup <em>before kickoff.</em></h1>
-<p class="hero-sub">Ask any NFL game a question in plain English. One brief comes back — then keep asking.</p>
-<ul class="hero-pts">
-<li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 6.2 11.5 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>One brief, not fifteen tabs.</b></span></li>
-<li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 6.2 11.5 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Injuries and usage translated</b> — who absorbs the snaps.</span></li>
-<li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 6.2 11.5 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Follow-ups that stay on the game.</b></span></li>
+<div class="wrap">
+
+<div class="hero-copy">
+<span class="hero-tag">NFL research, picks and projections</span>
+<h1>Know the matchup <em>before</em> the line moves.</h1>
+<p class="hero-sub">MonsterGPT reads live odds, model projections and matchup context, then answers your question in one brief instead of fifteen open tabs.</p>
+<ul class="hero-ul">
+<li><span class="tick"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.4 4.6 9 10 3.2" stroke="#14C46A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Ask any matchup a question in plain English.</li>
+<li><span class="tick"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.4 4.6 9 10 3.2" stroke="#14C46A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Injuries, snap share and live line movement in one structured answer.</li>
+<li><span class="tick"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 6.4 4.6 9 10 3.2" stroke="#14C46A" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>$27 a week. Cancel in two clicks.</li>
 </ul>
 <div class="hero-cta">
-<a class="btn btn-primary btn-lg" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
+<a class="btn btn-glow btn-lg" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
 </div>
-<div class="hero-meta">
-<span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 6.2 11.5 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Cancel anytime</span>
-<span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 6.2 11.5 13 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Research only — no picks</span>
-<span>+ 5% Whop fee at checkout</span>
+<div class="hero-meta">Cancel anytime · $28.35 today with the 5% Whop fee</div>
 </div>
-</div></div>
+
+<div class="rig">
+<div class="laptop">
+<div class="laptop-screen">
+<picture>
+<source type="image/webp" srcset="/assets/monstergpt-ui-desktop.webp">
+<img src="/assets/monstergpt-ui-desktop.jpg" width="1600" height="900" alt="MonsterGPT desktop interface showing a fictional matchup header, injury status, player usage and a comparison of FanDuel, DraftKings and BetMGM prices. Illustrative product demonstration." loading="eager" decoding="async">
+</picture>
+</div>
+<div class="laptop-base"></div>
+</div>
+<div class="phone">
+<picture>
+<source type="image/webp" srcset="/assets/monstergpt-ui-mobile.webp">
+<img src="/assets/monstergpt-ui-mobile.jpg" width="760" height="1465" alt="MonsterGPT mobile interface showing the same fictional matchup, injury status and line movement. Illustrative product demonstration." loading="eager" decoding="async">
+</picture>
+</div>
+<p class="rig-note">Illustrative product demonstration — fictional clubs, example figures.</p>
+</div>
+
+</div>
 </section>
 
-<!-- ═══ VERIFIED MONSTER.BET INTELLIGENCE ══════════════════════════════
-     Rendered only when the published intelligence file carries verified
-     matchups. Zero matchups, a stale file or a fetch failure all leave this
-     hidden — never an empty board, never a placeholder.                   -->
-<section class="sec grey" id="nflIntel" hidden aria-hidden="true"><div class="wrap">
-<div class="xa-head">
-<span class="kicker">Verified Monster.bet intelligence</span>
-<span class="xa-fresh" id="xaFresh"><i class="xa-dot"></i></span>
-</div>
-<div class="xa-list" id="xaList"></div>
-<p class="xa-src" id="xaSrc"></p>
-</div></section>
-
-<!-- ═══ PRODUCT DEMONSTRATION ══════════════════════════════════════════ -->
-<section class="sec" id="demo"><div class="wrap">
-<div class="sec-head" style="margin-bottom:14px">
+<!-- ═══ 2 · LIGHT PRODUCT DEMONSTRATION ════════════════════════════════ -->
+<section class="sec sec-lt" id="demo"><div class="wrap">
+<div class="sec-head">
 <span class="kicker">See it work</span>
-<h2>What $27 a week buys you</h2>
+<h2>One question. One brief.</h2>
 </div>
-<span class="demo-label"><i></i>Product demonstration — not live data</span>
+
+<p class="demo-note">◆ Illustrative product demonstration — fictional clubs, example figures, not live data.</p>
 
 <div class="chat">
-<div class="chat-bar"><span class="nm">Monster<b>GPT</b></span><span class="tag">Example session</span></div>
-<div class="chat-body">
 
-<div class="msg you">
-<span class="av">YOU</span>
-<div class="q">Fort Union at Bay Harbor — what decides this game?</div>
-</div>
+<div class="ask">Bay Harbor moved from −2.5 to −3.5 this week. What actually changed?</div>
 
-<div class="msg bot">
-<span class="av">M</span>
 <div class="ans">
-<div class="ans-top"><span class="mt">Fort Union @ Bay Harbor</span><span class="ex">Example output</span></div>
-<div class="ans-body">
-<p class="tldr"><b>Short version:</b> Bay Harbor wants it slow and heavy. Fort Union only wins by making the first quarter fast.</p>
-<div class="blk"><h4>Styles</h4><p>Bay Harbor runs heavy personnel on <b>41% of early downs</b>. Fort Union leaks on 2nd-and-short — exactly what that plan creates.</p></div>
-<div class="blk"><h4>Injuries</h4><p>Fort Union's slot corner is <b>out</b>; his backup has 71 snaps all season, 58 of them outside.</p></div>
-<div class="blk"><h4>Market</h4><p>Spread <b>−2.5 → −3.5</b>, total <b>44.5 → 43</b>. Both moved on the same news, which usually means the injury report.</p></div>
+<div class="ans-hd"><span class="ans-av">M</span><b>MonsterGPT</b></div>
+<div class="ans-rows">
+<div class="arow"><span class="lbl">Injuries</span><p><b>R. Castellan (WR1)</b> ruled out Friday — hamstring. He carried <b>31%</b> of the target share through two weeks.</p></div>
+<div class="arow"><span class="lbl">Usage</span><p>With Castellan out, <b>T. Brannigan</b> projects to <b>58%</b> snap share, up <span class="mvup">▲ 17 pts</span> on his Week 2 role.</p></div>
+<div class="arow"><span class="lbl">Line</span><p>Opened <b>−2.5</b>, now <b>−3.5</b> — the move crossed the key number 3, and it happened after the injury report, not before it.</p></div>
+<div class="arow"><span class="lbl">Books</span><p><b>DraftKings −108</b> against <b>BetMGM −112</b> on the same spread. The total has not followed the move.</p></div>
 </div>
-</div>
-</div>
-
-<div class="msg you">
-<span class="av">YOU</span>
-<div class="q">If their starting back sits, does the total change?</div>
+<p class="ans-ft">This example shows matchup context. MonsterGPT also produces AI picks and player and game projections. No wager is placed here or on Monster.bet.</p>
 </div>
 
-<div class="msg bot">
-<span class="av">M</span>
-<div class="ans">
-<div class="ans-top"><span class="mt">Follow-up · same game</span><span class="ex">Example output</span></div>
-<div class="ans-body">
-<p class="tldr"><b>Yes — the opposite way to the reflex.</b> The backup is the better pass-catcher, so third-down volume goes up, not down. That weakens the under, it doesn't strengthen it.</p>
-</div>
-</div>
-</div>
+<div class="ask">So is the total the disagreement worth reading?</div>
 
 </div>
-</div>
-
-<p class="demo-note">
-<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.6v4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="11.4" r="1" fill="currentColor"/></svg>
-<span>Fictional matchup, illustrative figures. A product demonstration, not live data or a prediction.</span>
-</p>
 </div></section>
 
-<!-- ═══ VISUAL BENEFIT STRIP ═══════════════════════════════════════════ -->
-<section class="sec grey" id="covers"><div class="wrap">
-<div class="sec-head" style="margin-bottom:18px">
-<span class="kicker">What it covers</span>
-<h2>Everything you check before kickoff</h2>
-</div>
-<div class="strip">
-<div class="sb">
-<div class="sb-i"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 4.5h13v11h-13z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 4.5v11M3.5 10h13" stroke="currentColor" stroke-width="1.7"/></svg></div>
-<h3>Matchups</h3><p>How the two styles actually collide.</p>
-</div>
-<div class="sb">
-<div class="sb-i"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></div>
-<h3>Injuries</h3><p>What a designation changes about the plan.</p>
-</div>
-<div class="sb">
-<div class="sb-i"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="6.2" r="2.9" stroke="currentColor" stroke-width="1.7"/><path d="M4 16.5c0-3 2.7-4.8 6-4.8s6 1.8 6 4.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
-<h3>Player usage</h3><p>Snap share and role shape across weeks.</p>
-</div>
-<div class="sb">
-<div class="sb-i"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 14.5 7.5 9l3.2 3 5.3-6.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.4 5.5H16v3.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-<h3>Line movement</h3><p>What moved, and the reasoning behind it.</p>
-</div>
-</div>
-<figure class="strip-art">
-<img src="/assets/line-movement.jpg" width="1000" height="618" alt="Abstract visualisation of two market lines crossing, one rising and one falling." loading="lazy" decoding="async">
-<figcaption><b>Ask why the number moved</b>Not just that it did.</figcaption>
-</figure>
-</div></section>
+<!-- ═══ 3 · DARK STADIUM BAND — benefits + verified intelligence ═══════ -->
+<section class="band">
+<picture class="band-bg">
+<source type="image/webp" srcset="/assets/nfl-turf-band.webp">
+<img src="/assets/nfl-turf-band.jpg" width="1600" height="620" alt="" loading="lazy" decoding="async" aria-hidden="true">
+</picture>
+<div class="band-scrim"></div>
+<div class="wrap">
 
-<!-- Social proof is intentionally absent: no verified reviews or approved
-     product evidence exist yet. Nothing here is to be fabricated. -->
+<div class="sec-head">
+<span class="kicker">What it reads</span>
+<h2>Four signals, one answer.</h2>
+</div>
 
-<!-- ═══ PRICING ════════════════════════════════════════════════════════ -->
-<section class="pricing" id="pricing"><div class="wrap">
-<div class="sec-head" style="margin-bottom:20px">
+<div class="feats">
+
+<div class="feat">
+<div class="feat-img">
+<picture>
+<source type="image/webp" media="(max-width:800px)" srcset="/assets/nfl-stadium-mobile.webp">
+<source type="image/webp" srcset="/assets/nfl-stadium-desktop.webp">
+<img src="/assets/nfl-stadium-desktop.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+</picture>
+<span class="feat-ic"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 4.5h13v11h-13z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 4.5v11" stroke="currentColor" stroke-width="1.8"/></svg></span>
+</div>
+<div class="feat-b"><h3>Matchup</h3><p>How the two styles actually collide.</p></div>
+</div>
+
+<div class="feat">
+<div class="feat-img">
+<picture>
+<source type="image/webp" srcset="/assets/nfl-injury.webp">
+<img src="/assets/nfl-injury.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+</picture>
+<span class="feat-ic"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+</div>
+<div class="feat-b"><h3>Injuries</h3><p>What a designation changes about the plan.</p></div>
+</div>
+
+<div class="feat">
+<div class="feat-img">
+<picture>
+<source type="image/webp" srcset="/assets/nfl-usage.webp">
+<img src="/assets/nfl-usage.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+</picture>
+<span class="feat-ic"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 16V9M8 16V5M13 16v-4M18 16V7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+</div>
+<div class="feat-b"><h3>Player usage</h3><p>Snap share and role shape across weeks.</p></div>
+</div>
+
+<div class="feat">
+<div class="feat-img">
+<picture>
+<source type="image/webp" srcset="/assets/nfl-turf-band.webp">
+<img src="/assets/nfl-turf-band.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
+</picture>
+<span class="feat-ic"><svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 14.5 7.5 9l3.2 3L16 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.4 5.5H16v3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+</div>
+<div class="feat-b"><h3>Line movement</h3><p>What moved, and the reasoning behind it.</p></div>
+</div>
+
+</div>
+
+<!-- Verified NFL intelligence. Rendered ONLY when the published file carries
+     complete verified signals; otherwise this stays display:none and nothing
+     about it is visible — no empty state, no placeholder, no "coming soon". -->
+<section class="snap" id="nflSnapshot" aria-labelledby="snapH">
+
+<div class="snap-hd">
+<div><span class="snap-kick">NFL · Spread</span>
+<h3 id="snapH">NFL Market Snapshot</h3></div>
+<span class="snap-cap">Static example</span>
+</div>
+
+<div class="snap-match">
+<div class="snap-teams"><b>Detroit Lions</b>
+<span class="snap-at">at</span><b>Buffalo Bills</b></div>
+<div class="snap-kickoff">Kickoff Thu 17 Sep 2026 · 8:15 PM ET <span>(18 Sep · 00:15 UTC)</span></div>
+</div>
+
+<p class="snap-flag"><b>Product example · captured 15 Sep 2026.</b> Prices are
+not current. Not a betting recommendation.</p>
+<div class="snap-grid">
+
+<div class="snap-panel">
+<h4>Model projection</h4>
+<div class="snap-scores">
+<div class="snap-sc"><span>DET</span><b>25.6</b></div>
+<div class="snap-sc snap-win"><span>BUF</span><b>28.9</b></div>
+<div class="snap-sc snap-tot"><span>Total</span><b>54.5</b></div>
+</div>
+<p class="snap-margin">Buffalo projected to win by
+<b>3.3 points</b></p>
+<div class="snap-prob">
+<div class="snap-pb"><i style="width:58.1%"></i></div>
+<div class="snap-pl"><span>BUF 58.1%</span>
+<span>DET 41.9%</span></div>
+</div>
+<p class="snap-guard">This is an average score margin, not a forecast of covering
+the −4.5 line. The two are different questions and this capture does not answer
+the second.</p>
+</div>
+
+<div class="snap-panel">
+<h4>Order book</h4>
+<div class="snap-sel">Buffalo Bills -4.5</div>
+<div class="snap-rows">
+<div class="snap-r"><span>Best ask</span>
+<b>-102</b><em>ProphetX</em></div>
+<div class="snap-r"><span>Best bid</span>
+<b>-100</b><em>Kalshi</em></div>
+<div class="snap-r"><span>Orders waiting</span>
+<b>$325.2K</b><em>3 venues</em></div>
+</div>
+<div class="snap-venues"><span>Kalshi</span><span>Polymarket</span><span>ProphetX</span></div>
+<p class="snap-guard"><b>Money waiting, not money wagered.</b> These are unfilled
+orders sitting on the book. Nobody has won or lost anything here.</p>
+</div>
+
+</div>
+
+
+<details class="snap-more">
+<summary>How these numbers were produced</summary>
+<div class="snap-more-b">
+<p><b>Two captures, 2 min 42 s apart.</b> The order book was
+collected at 02:42:00 UTC and the projection at
+02:44:42 UTC. They do not describe the same instant.</p>
+<p><b>Source clocks.</b> Order book — freshest record
+02:40:18 UTC, payload generated
+02:40:24 UTC. Projection — the API exposes no
+computation time at all, so only our collection time is known.</p>
+<p><b>Liquidity-weighted average bid: +160.</b>
+Computed by us as sum(price x liquidity) / sum(liquidity) across the three venues. No venue quotes this
+price; it is a summary statistic, kept out of the main view because it is easy
+to mistake for a tradable number.</p>
+<p><b>Field we do not interpret: <code>quality.actionable = false</code>.</b>
+The record carries this value. Monster.bet publishes no definition for it, and
+none appears in the product interface, so we report the value and draw no
+conclusion from it — in particular we do not claim the provider is warning
+against acting on this record.</p>
+<p><b>Provenance.</b> Read-only authenticated inspection of the Monster.bet
+product interface. Only display fields were extracted; no identifiers or
+credentials are present in this page.</p>
+</div>
+</details>
+</section>
+
+</div>
+</section>
+
+<!-- ═══ 4 · LIGHT COMPACT PRICING ══════════════════════════════════════ -->
+<section class="sec sec-gr" id="pricing"><div class="wrap">
+<div class="sec-head">
 <span class="kicker">Subscribe</span>
 <h2>Start weekly. Save by committing.</h2>
 </div>
@@ -480,7 +678,7 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 <h3>Weekly</h3>
 <div class="amt"><b>$27</b><span>/ week</span></div>
 <p class="per">Billed weekly · cancel anytime</p>
-<p class="save">Full access for one NFL week.</p>
+<p class="save">One NFL week of access.</p>
 <div class="spacer"></div>
 <a class="btn btn-primary" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
 <p class="total">$28.35 today with the 5% Whop fee</p>
@@ -512,52 +710,52 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
 </div>
 </div></section>
 
-<!-- ═══ FAQ ════════════════════════════════════════════════════════════ -->
-<section class="sec" id="faq"><div class="wrap">
-<div class="sec-head" style="margin-bottom:16px"><h2>Before you subscribe</h2></div>
-<div class="faq">
-<details open>
-<summary>What do I get for $27 a week?</summary>
-<p>Unlimited research on any NFL matchup — styles, injuries, usage, line movement — plus unlimited follow-up questions that stay on the game you asked about.</p>
-</details>
-<details>
-<summary>Does it give picks or guarantee winners?</summary>
-<p>No. It organises research and explains context. It does not sell picks, predict results or place any wager.</p>
-</details>
-<details>
-<summary>How do I cancel?</summary>
-<p>In your Whop account, anytime. Access runs to the end of the period you paid for. No fee, no minimum term.</p>
-</details>
-<details>
-<summary>Why is checkout higher than the plan price?</summary>
-<p>Whop adds a 5% service fee: $28.35 weekly, $80.85 monthly, $808.50 yearly. That fee goes to Whop.</p>
-</details>
-</div>
-</div></section>
-
-<!-- ═══ FINAL CTA ══════════════════════════════════════════════════════ -->
+<!-- ═══ 5 · DARK FINAL CTA ═════════════════════════════════════════════ -->
 <section class="final">
-<picture class="final-photo">
-<source type="image/webp" srcset="/assets/research-visual.webp">
-<img src="/assets/research-visual.jpg" width="1000" height="684" alt="" loading="lazy" decoding="async" aria-hidden="true">
+<picture class="final-bg">
+<source type="image/webp" media="(max-width:800px)" srcset="/assets/nfl-stadium-mobile.webp">
+<source type="image/webp" srcset="/assets/nfl-stadium-desktop.webp">
+<img src="/assets/nfl-stadium-desktop.jpg" alt="" loading="lazy" decoding="async" aria-hidden="true">
 </picture>
 <div class="final-scrim"></div>
 <div class="wrap">
 <h2>The slate is up. <em>Ask it something.</em></h2>
 <p>One brief per matchup, and a subscription you can end in two clicks.</p>
 <div class="hero-cta">
-<a class="btn btn-primary btn-lg" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
+<a class="btn btn-glow btn-lg" href="https://whop.com/checkout/plan_W6g9YbKpUMMMA/?a=xentraffic" target="_blank" rel="noopener" data-product="monstergpt_weekly">Get MonsterGPT — $27/week</a>
 </div>
-<div class="hero-meta"><span>Cancel anytime · $28.35 today with the 5% Whop fee</span></div>
+<div class="hero-meta">Cancel anytime · $28.35 today with the 5% Whop fee</div>
 </div>
 </section>
 
 <footer class="disclaimer"><div class="wrap">
 <p><strong>Monster.bet</strong> <span class="age">18+</span></p>
 <p><strong>Pricing:</strong> $27 / week, $77 / month, $770 / year. Whop adds a 5% service fee, making the totals $28.35, $80.85 and $808.50. Cancel anytime in your Whop account; access runs to the end of the paid period.</p>
-<p><strong>Product demonstration:</strong> the MonsterGPT session shown above uses a fictional matchup and illustrative figures. It is not live data, not a real game and not a prediction.</p>
+<p><strong>Product demonstration:</strong> every MonsterGPT screen and conversation shown above is an illustrative product demonstration. Fort Union and Bay Harbor are fictional clubs, and every figure, injury, snap share, line and price is an example of the format — not live data, not a real game and not a prediction.</p>
 <p><strong>Independent product:</strong> Monster.bet is not affiliated with, endorsed by or sponsored by the NFL, any team, any player or any sportsbook. No league, team or sportsbook trademarks appear on this site; all football imagery is original artwork depicting fictional athletes in unbranded uniforms.</p>
-<p><strong>Responsible use:</strong> MonsterGPT provides research and context only. It does not accept or place wagers, sell picks, guarantee outcomes or give financial advice. 18+; know your local laws, risk only what you can afford to lose, and play responsibly.</p>
+<p><strong>Affiliate relationship:</strong> Xentraffic operates this site as an
+independent affiliate of Monster.bet and is paid a commission on subscriptions
+started here. Monster.bet is the seller of record; Whop processes the payment.
+We do not set the price, control the product or handle your subscription — all
+billing, access and cancellation questions go to Monster.bet through your Whop
+account.</p>
+<p><strong>Responsible use:</strong> MonsterGPT provides sports research, AI picks
+and player and game projections. It does not accept or place wagers, guarantee
+outcomes or give financial advice. Intended for adults 18+, and 21+ in United States jurisdictions where that
+is the legal age for sports wagering. Know your local laws, risk only what you can
+afford to lose, and play responsibly.</p>
+<p><strong>If gambling stops being fun:</strong> help is free, confidential and
+available 24/7. United States — National Problem Gambling Helpline,
+<a href="tel:18004262537">1-800-522-4700</a> or
+<a href="https://www.ncpgambling.org/help-treatment/" target="_blank" rel="noopener nofollow">ncpgambling.org</a>.
+Canada — <a href="https://www.problemgambling.ca/" target="_blank" rel="noopener nofollow">problemgambling.ca</a>.
+Elsewhere, contact your national problem-gambling service.</p>
+<div class="foot-links">
+<a href="/terms.html">Terms of use</a>
+<a href="/privacy.html">Privacy policy</a>
+<a href="/terms.html#affiliate">Affiliate disclosure</a>
+<a href="mailto:contact@monsterbet.ai">Contact</a>
+</div>
 </div></footer>
 
 </main>
@@ -579,132 +777,82 @@ details p{padding:0 16px 14px; font-size:14px; color:var(--mid); line-height:1.5
   },{rootMargin:'-60px 0px 0px 0px'}).observe(hero);
 })();
 </script><script>
-/* ── Verified Monster.bet intelligence ──────────────────────────────────
-   Reads /nfl-intel.json, a dated snapshot produced server-side by the build
-   script and committed with the page. It is not a live feed and does not
-   refresh on its own. The provider API key never reaches the browser: the
-   generator runs on the server and publishes only validated, non-secret
+/* ── Verified NFL intelligence ───────────────────────────────────────────
+   Reads /nfl-intel.json, republished on a server-side schedule by
+   scripts/build-xenarb-nfl.py. The provider key never reaches the browser:
+   the generator runs on the server and publishes only validated, non-secret
    fields.
 
-   This module renders a matchup ONLY when the file states it. It never
-   derives, rounds or fills in a value. Zero matchups, a stale file, a fetch
+   A row renders ONLY when the file states every field it needs. Nothing is
+   derived, rounded or filled in here. Zero signals, a stale file, a fetch
    failure or a malformed document all leave the section hidden — there is no
-   empty state and no "coming soon" anywhere in this file.
-
-   It does not touch the odds-board renderer below; that keeps its own DOM.  */
+   empty state and no "coming soon" anywhere in this file.        */
 (function(){
   'use strict';
-  var MAX_AGE_MS = 6*60*60*1000;   // a snapshot older than this is not "live"
-  var MIN_ROWS = 1, MAX_ROWS = 5;
+  var MAX_AGE_MS = 6*60*60*1000;      // older than this is not "live"
+  var MAX_ROWS = 3;
+  var NEED = ['away','home','sportsbook','firstSeenPrice','currentPrice','observedAt'];
   var sec=document.getElementById('nflIntel');
-  if(!sec)return;
+  if(!sec||!('fetch' in window))return;
 
-  function txt(el,s){el.textContent=String(s)}
-  function el(tag,cls,text){var n=document.createElement(tag);
-    if(cls)n.className=cls; if(text!==undefined)txt(n,text); return n}
+  function txt(v){return String(v).replace(/[<>&]/g,'')}
+  function num(v){return typeof v==='number'&&isFinite(v)}
 
-  function ago(ms){
-    var m=Math.round(ms/60000);
-    if(m<1)return 'just now';
-    if(m<60)return m+' min ago';
-    var h=Math.round(m/60);
-    return h+(h===1?' hour ago':' hours ago');
-  }
-  function kickoffLabel(iso){
-    var d=new Date(iso);
-    if(isNaN(d))return null;
-    return d.toLocaleString([], {weekday:'short', hour:'numeric', minute:'2-digit'});
+  function fresh(iso){
+    var t=Date.parse(iso);
+    if(!isFinite(t))return null;
+    var age=Date.now()-t;
+    if(age<0||age>MAX_AGE_MS)return null;
+    var m=Math.round(age/60000);
+    return m<1?'updated just now':m===1?'updated 1 min ago':'updated '+m+' min ago';
   }
 
-  /* A row is built only from fields the feed actually carries. Any signal
-     missing its own required values is dropped rather than guessed. */
-  function signalChips(sigs){
-    var out=[];
-    (sigs||[]).forEach(function(s){
-      if(s.kind==='line_movement' && s.open!==undefined && s.open!==null
-         && s.current!==undefined && s.current!==null){
-        var up=Number(s.current)>Number(s.open);
-        var chip=el('span','xa-sig '+(up?'up':'dn'));
-        chip.appendChild(el('span',null,(s.market||'Line')+' '));
-        chip.appendChild(el('b',null,s.open+' → '+s.current));
-        out.push(chip);
-      } else if(s.kind==='context' && s.text){
-        out.push(el('span','xa-sig',String(s.text)));
-      } else if(s.kind==='disagreement' && Array.isArray(s.books) && s.books.length>=2){
-        var ok=s.books.filter(function(b){return b.book && (b.price!=null||b.value!=null)});
-        if(ok.length>=2){
-          var c=el('span','xa-sig');
-          c.appendChild(el('span',null,'Books split '));
-          c.appendChild(el('b',null,ok.map(function(b){
-            return b.book+' '+(b.value!=null?b.value:b.price)}).join(' / ')));
-          out.push(c);
-        }
-      }
-    });
-    return out;
-  }
+  fetch('/nfl-intel.json?t='+Math.floor(Date.now()/60000),{cache:'no-store'})
+   .then(function(r){return r.ok?r.json():Promise.reject()})
+   .then(function(doc){
+     if(!doc||!Array.isArray(doc.signals))return;
+     var stamp=fresh(doc.sourceTimestamp||doc.generatedAt);
+     if(!stamp)return;                       // stale or undated → stay hidden
 
-  function row(m){
-    if(!m || !m.away || !m.home || !m.kickoff) return null;
-    var when=kickoffLabel(m.kickoff);
-    if(!when) return null;
-    var chips=signalChips(m.signals);
-    if(!chips.length) return null;          // nothing verified to say -> no row
+     var rows=doc.signals.filter(function(s){
+       if(!s||typeof s!=='object')return false;
+       for(var i=0;i<NEED.length;i++){
+         var v=s[NEED[i]];
+         if(v===null||v===undefined||v==='')return false;
+       }
+       return num(s.firstSeenPrice)&&num(s.currentPrice);
+     }).slice(0,MAX_ROWS);
+     if(!rows.length)return;                 // nothing complete → stay hidden
 
-    var r=el('article','xa-row');
-    var left=el('div');
-    left.appendChild(el('div','xa-match',m.away+' @ '+m.home));
-    left.appendChild(el('div','xa-when',when));
-    var sigs=el('div','xa-sigs');
-    chips.forEach(function(c){sigs.appendChild(c)});
-    left.appendChild(sigs);
-    var a=el('a','xa-cta','Research with MonsterGPT');
-    a.href='#pricing';
-    r.append(left,a);
-    return r;
-  }
-
-  function render(doc){
-    if(!doc || doc.schemaVersion!=='1.0' || !Array.isArray(doc.matchups)) return false;
-    var gen=new Date(doc.generatedAt||doc.sourceTimestamp);
-    if(isNaN(gen)) return false;
-    var age=Date.now()-gen.getTime();
-    if(age>MAX_AGE_MS || age< -60000) return false;   // stale, or clock nonsense
-
-    var list=document.getElementById('xaList');
-    var rows=[];
-    doc.matchups.slice(0,MAX_ROWS).forEach(function(m){
-      var r=row(m); if(r)rows.push(r);
-    });
-    if(rows.length<MIN_ROWS) return false;
-
-    list.replaceChildren();
-    rows.forEach(function(r){list.appendChild(r)});
-    txt(document.getElementById('xaFresh').appendChild(el('span')),
-        'Source updated '+ago(age));
-    txt(document.getElementById('xaSrc'),
-        'Source: '+(doc.source||'Verified Monster.bet intelligence')+
-        (doc.sourceTimestamp?' · snapshot '+new Date(doc.sourceTimestamp).toUTCString():''));
-    sec.hidden=false; sec.setAttribute('aria-hidden','false');
-    return true;
-  }
-
-  try{
-    fetch('/nfl-intel.json',{cache:'no-store'})
-      .then(function(r){return r.ok?r.json():null})
-      .then(function(d){ try{ render(d); }catch(_){} })
-      .catch(function(){ /* stay hidden, silently */ });
-  }catch(_){ /* stay hidden, silently */ }
+     var host=document.getElementById('intelRows');
+     rows.forEach(function(s){
+       var move=s.currentPrice-s.firstSeenPrice;
+       var el=document.createElement('div');
+       el.className='sig';
+       el.innerHTML=
+         '<div class="sig-m">'+txt(s.away)+' @ '+txt(s.home)+'</div>'+
+         '<div class="sig-b">'+txt(s.sportsbook)+
+           (s.market?' · '+txt(s.market):'')+'</div>'+
+         '<div class="sig-p"><span class="o">'+txt(s.firstSeenPrice)+'</span>'+
+           '<span class="ar">→</span><span class="c">'+txt(s.currentPrice)+
+           '</span><span class="sigmv">'+(move>0?'▲ ':'▼ ')+
+           txt(Math.abs(move).toFixed(1))+'</span></div>'+
+         '<a class="sig-cta" href="#pricing">Research this matchup →</a>';
+       host.appendChild(el);
+     });
+     document.getElementById('intelFresh').textContent=stamp;
+     sec.classList.remove('hidden');
+   })
+   .catch(function(){/* hidden is the correct resting state */});
 })();
-</script>
-<script>
+</script><script>
 (function(){
   'use strict';
   var GA='G-5VBBKZWLYL', enabled=/^G-[A-Z0-9]+$/i.test(GA), query=new URLSearchParams(location.search), ref='(direct)';
   try{if(document.referrer)ref=new URL(document.referrer).origin}catch(e){}
-  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',referrer:ref};
+  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',utm_term:query.get('utm_term')||'(not set)',utm_id:query.get('utm_id')||'(not set)',click_id:query.get('gclid')||query.get('gbraid')||query.get('wbraid')||'(none)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
-  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content'];
+  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','gclid','gbraid','wbraid'];
   /* Every CTA on the page resolves to a real section; the fallback exists
      only so a future CTA cannot report an empty location. */
   function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('#demo')?'product_demo':a.closest('.final')?'final_cta':'other'}

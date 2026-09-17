@@ -1,9 +1,17 @@
 {
- "schemaVersion": "1.0",
+ "schemaVersion": "2.0",
  "source": "Verified Monster.bet intelligence",
- "sourceTimestamp": "2026-09-14T03:44:55.568343938+00:00",
- "generatedAt": "2026-09-14T03:44:55Z",
- "itemsScanned": 207,
- "nflSportsbookCandidates": 3,
- "matchups": []
+ "sourceTimestamp": "2026-09-14T04:27:36.302473515+00:00",
+ "generatedAt": "2026-09-14T04:27:41Z",
+ "itemsScanned": 237,
+ "nflSportsbookCandidates": 4,
+ "signals": [],
+ "unresolvedFields": [
+  "away",
+  "currentPrice",
+  "firstSeenPrice",
+  "home",
+  "kickoff",
+  "observedAt"
+ ]
 }

@@ -850,9 +850,9 @@ Elsewhere, contact your national problem-gambling service.</p>
   'use strict';
   var GA='G-5VBBKZWLYL', enabled=/^G-[A-Z0-9]+$/i.test(GA), query=new URLSearchParams(location.search), ref='(direct)';
   try{if(document.referrer)ref=new URL(document.referrer).origin}catch(e){}
-  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',utm_term:query.get('utm_term')||'(not set)',click_id:query.get('gclid')||query.get('gbraid')||query.get('wbraid')||'(none)',referrer:ref};
+  var context={page_path:location.pathname,utm_source:query.get('utm_source')||'(direct)',utm_medium:query.get('utm_medium')||'(none)',utm_campaign:query.get('utm_campaign')||'(not set)',utm_content:query.get('utm_content')||'(not set)',utm_term:query.get('utm_term')||'(not set)',utm_id:query.get('utm_id')||'(not set)',click_id:query.get('gclid')||query.get('gbraid')||query.get('wbraid')||'(none)',referrer:ref};
   if(enabled){window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',GA);var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s)}
-  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','gbraid','wbraid'];
+  var campaignKeys=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','gclid','gbraid','wbraid'];
   /* Every CTA on the page resolves to a real section; the fallback exists
      only so a future CTA cannot report an empty location. */
   function ctaLocation(a){return a.closest('header')?'header':a.closest('.sticky-cta')?'mobile_sticky':a.closest('#pricing')?'pricing':a.closest('.hero')?'hero':a.closest('#demo')?'product_demo':a.closest('.final')?'final_cta':'other'}
